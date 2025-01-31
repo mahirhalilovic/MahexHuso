@@ -7,14 +7,14 @@
 // ==== TASKS ====
 
 // [+] Implement basic game loop
-// [-] Create movement mechanics for characters
-// [-] Implement gravity for jumping
-// [-] Implement stationary tiles
-// [-] Implement collisions
-// [-] Implement sprites
-// [-] Draw character sprites and tiles
-// [-] Create testing level
-// [-] Prevent movement outside of borders
+// [+] Create movement mechanics for characters
+// [+] Implement gravity for jumping
+// [+] Implement stationary tiles
+// [+] Implement collisions
+// [+] Implement sprites
+// [+] Draw character sprites and tiles
+// [+] Create testing level
+// [+] Prevent movement outside of borders
 // [-] Design basic game level to test out collisions and movement
 // [-] Add cooperative mechanics(other player)
 // [-] Implement end goals
@@ -42,7 +42,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "Game.hpp"
+#include "headers/Game.hpp"
 
 #define FPS_MAX 60
 
@@ -88,22 +88,33 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
 
     ShowWindow(hwnd, nCmdShow);
 
+    Game game(hwnd);
+
+    DWORD previousTime = GetTickCount();
+    DWORD currentTime;
+    DWORD deltaTime;
+
     while(true) {
-        if(PeekMessage(&messages, NULL, 0, 0, PM_REMOVE))
-        {
-            if(messages.message == WM_QUIT)
-            {
+        if(PeekMessage(&messages, NULL, 0, 0, PM_REMOVE)) {
+            if(messages.message == WM_QUIT) {
                 break;
             }
             TranslateMessage(&messages);
             DispatchMessage(&messages);
         }
 
-        DWORD timeStart = GetTickCount();
-        
-        //Render(hwnd);
-        
-        while(GetTickCount() - timeStart < 1000 / FPS_MAX) Sleep(5);
+        currentTime = GetTickCount();
+        deltaTime = currentTime - previousTime;
+
+        if(deltaTime >= 1000 / FPS_MAX) {
+            // Update and render directly
+            game.Update();
+            game.Render();
+
+            previousTime = currentTime;
+        } else {
+            Sleep(1);
+        }
     }
 
     return messages.wParam;

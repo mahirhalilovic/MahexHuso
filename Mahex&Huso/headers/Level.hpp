@@ -8,5 +8,6 @@
 
 struct Level {
 	std::vector<Tile> m_tiles;
-	Tile m_startingTile;
+	Tile m_startingTileMahex;
+	Tile m_startingTileHuso;
 };
