@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.hpp" />
+    <ClInclude Include="headers\Button.hpp" />
     <ClInclude Include="headers\Game.hpp" />
     <ClInclude Include="headers\Level.hpp" />
     <ClInclude Include="headers\Object.hpp" />

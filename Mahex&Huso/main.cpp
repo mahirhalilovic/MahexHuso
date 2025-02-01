@@ -44,10 +44,6 @@
 
 #include "headers/Game.hpp"
 
-#define FPS_MAX 60
-
-void Render(HWND);
-
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nCmdShow) {
@@ -130,15 +126,4 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
     }
 
     return 0;
-}
-
-void Render(HWND hwnd) {
-    HDC hdc = GetDC(hwnd);
-    HBRUSH brush = CreateSolidBrush(0xff);
-    for(int i = 0; i * 32 < 900; ++i) {
-        RECT rect = {i * 32, i * 32, i * 32 + 32, i * 32 + 32};
-        FillRect(hdc, &rect, brush);
-    }
-
-    DeleteObject(brush);
 }

@@ -1,6 +1,10 @@
 #include "headers/Game.hpp"
 
 Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
+    buttonMainMenuPlay = Button(100, 100, 200, 50, L"Play");
+    buttonMainMenuOptions = Button(100, 200, 200, 50, L"Options");
+    buttonMainMenuExit = Button(100, 300, 200, 50, L"Exit");
+
     Mahex = Player{100, 100,
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
@@ -77,6 +81,58 @@ void Game::UpdatePlayer(Player &player) {
 }
 
 void Game::Render() {
+    switch(m_state) {
+        case GameState::MAIN_MENU:
+            RenderMainMenu();
+            break;
+
+        case GameState::PLAY_MENU:
+            RenderPlayMenu();
+            break;
+
+        case GameState::GAME_LEVELS:
+            RenderGameLevels();
+            break;
+
+        case GameState::CUSTOM_LEVELS:
+            RenderCustomLevels();
+            break;
+
+        case GameState::LEVEL_EDITOR:
+            RenderLevelEditor();
+            break;
+
+        case GameState::OPTIONS:
+            RenderOptions();
+            break;
+
+        case GameState::IN_GAME:
+            RenderInGame();
+            break;
+    }
+}
+
+void Game::RenderMainMenu() {
+    HDC hdc = GetDC(m_hwnd);
+
+    buttonMainMenuPlay.Render(hdc);
+    buttonMainMenuOptions.Render(hdc);
+    buttonMainMenuExit.Render(hdc);
+
+    ReleaseDC(m_hwnd, hdc);
+}
+
+void Game::RenderPlayMenu() {}
+
+void Game::RenderGameLevels() {}
+
+void Game::RenderCustomLevels() {}
+
+void Game::RenderLevelEditor() {}
+
+void Game::RenderOptions() {}
+
+void Game::RenderInGame() {
     HDC hdc = GetDC(m_hwnd);
 
     HDC hdcBuffer = CreateCompatibleDC(hdc);
@@ -138,10 +194,34 @@ void Game::CheckInput() {
     if(IsKeyPressed('R')) {
         Mahex.m_posX = 100;
         Mahex.m_posY = 100;
+        Mahex.m_velX = 0;
+        Mahex.m_velY = 0;
+    }
+
+    if(IsKeyPressed('T')) {
+        m_state = GameState::IN_GAME;
     }
 
     if(IsKeyPressed('Q')) {
         SendMessage(m_hwnd, WM_CLOSE, 0, 0);
+    }
+
+    if(IsKeyPressed(VK_LBUTTON)) {
+        POINT mousePos;
+        GetCursorPos(&mousePos);
+        ScreenToClient(m_hwnd, &mousePos);
+
+        buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
+        buttonMainMenuOptions.hovered = buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
+        buttonMainMenuExit.hovered = buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y);
+
+        if(buttonMainMenuPlay.hovered) {
+            MessageBox(m_hwnd, L"Play button pressed!", L"Play button", MB_OK);
+        } else if(buttonMainMenuOptions.hovered) {
+            MessageBox(m_hwnd, L"Options button pressed!", L"Options button", MB_OK);
+        } else if(buttonMainMenuExit.hovered) {
+            MessageBox(m_hwnd, L"Exit button pressed!", L"Exit button", MB_OK);
+        }
     }
 }
 
