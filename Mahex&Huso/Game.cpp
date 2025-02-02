@@ -4,6 +4,9 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     buttonMainMenuPlay = Button(100, 100, 200, 50, L"Play");
     buttonMainMenuOptions = Button(100, 200, 200, 50, L"Options");
     buttonMainMenuExit = Button(100, 300, 200, 50, L"Exit");
+    buttonPlayMenuGameLevels = Button(100, 100, 200, 50, L"Game Levels");
+    buttonPlayMenuCustomLevels = Button(100, 200, 200, 50, L"Custom Levels");
+    buttonPlayMenuBack = Button(100, 300, 200, 50, L"Back");
 
     Mahex = Player{100, 100,
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
@@ -115,6 +118,12 @@ void Game::Render() {
 void Game::RenderMainMenu() {
     HDC hdc = GetDC(m_hwnd);
 
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+    HBRUSH brush = CreateSolidBrush(RGB(255, 255, 255));
+    FillRect(hdc, &clientRect, brush);
+    DeleteObject(brush);
+
     buttonMainMenuPlay.Render(hdc);
     buttonMainMenuOptions.Render(hdc);
     buttonMainMenuExit.Render(hdc);
@@ -122,7 +131,21 @@ void Game::RenderMainMenu() {
     ReleaseDC(m_hwnd, hdc);
 }
 
-void Game::RenderPlayMenu() {}
+void Game::RenderPlayMenu() {
+    HDC hdc = GetDC(m_hwnd);
+
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+    HBRUSH brush = CreateSolidBrush(RGB(255, 255, 255));
+    FillRect(hdc, &clientRect, brush);
+    DeleteObject(brush);
+
+    buttonPlayMenuGameLevels.Render(hdc);
+    buttonPlayMenuCustomLevels.Render(hdc);
+    buttonPlayMenuBack.Render(hdc);
+
+    ReleaseDC(m_hwnd, hdc);
+}
 
 void Game::RenderGameLevels() {}
 
@@ -175,6 +198,33 @@ void Game::RenderInGame() {
 }
 
 void Game::CheckInput() {
+    POINT mousePos;
+    GetCursorPos(&mousePos);
+    ScreenToClient(m_hwnd, &mousePos);
+
+    // Reset all hover states first
+    buttonMainMenuPlay.ResetHoverState();
+    buttonMainMenuOptions.ResetHoverState();
+    buttonMainMenuExit.ResetHoverState();
+    buttonPlayMenuGameLevels.ResetHoverState();
+    buttonPlayMenuCustomLevels.ResetHoverState();
+    buttonPlayMenuBack.ResetHoverState();
+
+    // Then only check hover for current state's buttons
+    switch(m_state) {
+        case GameState::MAIN_MENU:
+            buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
+            buttonMainMenuOptions.hovered = buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
+            buttonMainMenuExit.hovered = buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y);
+            break;
+
+        case GameState::PLAY_MENU:
+            buttonPlayMenuGameLevels.hovered = buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y);
+            buttonPlayMenuCustomLevels.hovered = buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y);
+            buttonPlayMenuBack.hovered = buttonPlayMenuBack.IsMouseOver(mousePos.x, mousePos.y);
+            break;
+    }
+
     if(IsKeyPressed(VK_LEFT)) {
         Mahex.m_direction = DIRECTION_LEFT;
         Mahex.m_velX = -MOVE_SPEED;
@@ -207,21 +257,57 @@ void Game::CheckInput() {
     }
 
     if(IsKeyPressed(VK_LBUTTON)) {
-        POINT mousePos;
-        GetCursorPos(&mousePos);
-        ScreenToClient(m_hwnd, &mousePos);
+        ProcessMouseClick(mousePos);
+    }
+}
 
-        buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
-        buttonMainMenuOptions.hovered = buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
-        buttonMainMenuExit.hovered = buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y);
+void Game::ProcessMouseClick(POINT mousePos) {
+    if(m_state == GameState::MAIN_MENU) MessageBox(m_hwnd, L"Game state: MAIN_MENU", L"Mouse clicked", MB_OK);
+    else MessageBox(m_hwnd, L"Game state: PLAY_MENU", L"Mouse clicked", MB_OK);
 
-        if(buttonMainMenuPlay.hovered) {
-            MessageBox(m_hwnd, L"Play button pressed!", L"Play button", MB_OK);
-        } else if(buttonMainMenuOptions.hovered) {
-            MessageBox(m_hwnd, L"Options button pressed!", L"Options button", MB_OK);
-        } else if(buttonMainMenuExit.hovered) {
-            MessageBox(m_hwnd, L"Exit button pressed!", L"Exit button", MB_OK);
-        }
+    switch(m_state) {
+        case GameState::MAIN_MENU:
+            if(buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y)) {
+                buttonMainMenuPlay.ResetHoverState();
+                buttonMainMenuOptions.ResetHoverState();
+                buttonMainMenuExit.ResetHoverState();
+                m_state = GameState::PLAY_MENU;
+            } else if(buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
+                buttonMainMenuPlay.ResetHoverState();
+                buttonMainMenuOptions.ResetHoverState();
+                buttonMainMenuExit.ResetHoverState();
+                m_state = GameState::OPTIONS;
+            } else if(buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y)) {
+                SendMessage(m_hwnd, WM_CLOSE, 0, 0);
+            }
+            break;
+
+        case GameState::PLAY_MENU:
+            if(buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y)) {
+                buttonPlayMenuGameLevels.ResetHoverState();
+                buttonPlayMenuCustomLevels.ResetHoverState();
+                buttonPlayMenuBack.ResetHoverState();
+                //m_state = GameState::GAME_LEVELS;
+                m_state = GameState::IN_GAME;
+            } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
+                buttonPlayMenuGameLevels.ResetHoverState();
+                buttonPlayMenuCustomLevels.ResetHoverState();
+                buttonPlayMenuBack.ResetHoverState();
+                m_state = GameState::CUSTOM_LEVELS;
+            } else if(buttonPlayMenuBack.IsMouseOver(mousePos.x, mousePos.y)) {
+                buttonPlayMenuGameLevels.ResetHoverState();
+                buttonPlayMenuCustomLevels.ResetHoverState();
+                buttonPlayMenuBack.ResetHoverState();
+                m_state = GameState::MAIN_MENU;
+            }
+            break;
+
+        case GameState::GAME_LEVELS:
+        case GameState::CUSTOM_LEVELS:
+        case GameState::LEVEL_EDITOR:
+        case GameState::OPTIONS:
+        case GameState::IN_GAME:
+            break;
     }
 }
 

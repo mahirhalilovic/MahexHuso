@@ -42,6 +42,7 @@ class Game {
 		Display m_display;
 
 		Button buttonMainMenuPlay, buttonMainMenuOptions, buttonMainMenuExit;
+		Button buttonPlayMenuGameLevels, buttonPlayMenuCustomLevels, buttonPlayMenuBack;
 
 		bool m_fullscreen = false;
 		int m_winWidth = 1920;
@@ -57,6 +58,7 @@ class Game {
 
 		void UpdatePlayer(Player&);
 		void CheckInput();
+		void ProcessMouseClick(POINT);
 		bool ToggleFullScreen();
 		bool ToggleFullScreen(bool);
 };

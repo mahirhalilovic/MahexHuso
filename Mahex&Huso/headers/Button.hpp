@@ -55,4 +55,8 @@ class Button {
 
         RestoreDC(hdc, savedDC);
     }
+
+    void ResetHoverState() {
+        hovered = false;
+    }
 };
