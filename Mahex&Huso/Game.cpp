@@ -1,39 +1,45 @@
 #include "headers/Game.hpp"
+#pragma comment(lib, "Msimg32.lib")
 
 Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
-    buttonMainMenuPlay = Button(100, 100, 200, 50, L"Play");
-    buttonMainMenuOptions = Button(100, 200, 200, 50, L"Options");
-    buttonMainMenuExit = Button(100, 300, 200, 50, L"Exit");
-    buttonPlayMenuGameLevels = Button(100, 100, 200, 50, L"Game Levels");
-    buttonPlayMenuCustomLevels = Button(100, 200, 200, 50, L"Custom Levels");
-    buttonPlayMenuBack = Button(100, 300, 200, 50, L"Back");
+    m_backgroundMainMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mainmenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_backgroundMaskMainMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_mainmenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
-    Mahex = Player{100, 100,
+    buttonMainMenuPlay = Button(500, 235, 200, 50, L"PLAY");
+    buttonMainMenuOptions = Button(500, 335, 200, 50, L"OPTIONS");
+    buttonMainMenuExit = Button(500, 435, 200, 50, L"EXIT");
+    buttonPlayMenuGameLevels = Button(500, 235, 200, 50, L"GAME LEVELS");
+    buttonPlayMenuCustomLevels = Button(500, 335, 200, 50, L"CUSTOM LEVELS");
+    buttonPlayMenuBack = Button(500, 435, 200, 50, L"BACK");
+
+    buttonMainMenuPlay.SetFont(L"i pixel u", 26, false);
+    buttonMainMenuOptions.SetFont(L"i pixel u", 26, false);
+    buttonMainMenuExit.SetFont(L"i pixel u", 26, false);
+    buttonPlayMenuGameLevels.SetFont(L"i pixel u", 26, false);
+    buttonPlayMenuCustomLevels.SetFont(L"i pixel u", 26, false);
+    buttonPlayMenuBack.SetFont(L"i pixel u", 26, false);
+
+    Mahex = Player{0, 0,
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    0.f, 0.f, true, 0, IDLE};
 
-    Tile tile1 = {100, 500,
-                  (HBITMAP) LoadImage(NULL, L"assets/images/tile.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                  (HBITMAP) LoadImage(NULL, L"assets/images/tile_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                  true, true};
-    Tile tile2 = {200, 500,
-                  (HBITMAP) LoadImage(NULL, L"assets/images/tile.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                  (HBITMAP) LoadImage(NULL, L"assets/images/tile_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                  true, true};
-    Tile tile3 = {300, 400,
-                  (HBITMAP) LoadImage(NULL, L"assets/images/tile.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                  (HBITMAP) LoadImage(NULL, L"assets/images/tile_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                  true, true};
+    std::vector<Tile> tiles;
 
-    m_level.push_back(tile1);
-    m_level.push_back(tile2);
-    m_level.push_back(tile3);
+    for(int i = 0; i < 25; ++i) {
+        tiles.push_back({48 * i, 672,
+                        (HBITMAP) LoadImage(NULL, L"assets/images/tile.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                        (HBITMAP) LoadImage(NULL, L"assets/images/tile_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                        true, true});
+    }
+
+    m_currentLevel.m_tiles = std::move(tiles);
+    m_currentLevel.m_startingPoint = {56, 640};
 }
 
 void Game::Update() {
     CheckInput();
-    UpdatePlayer(Mahex);
+    if(m_state == GameState::IN_GAME) UpdatePlayer(Mahex);
     //UpdatePlayer(Huso);
 }
 
@@ -48,29 +54,29 @@ void Game::UpdatePlayer(Player &player) {
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
 
-    RECT currentRect = {player.m_posX, player.m_posY, player.m_posX + 64, player.m_posY + 64};
-    RECT nextRect = {newPosX, newPosY, newPosX + 64, newPosY + 64};
+    RECT currentRect = {player.m_posX, player.m_posY, player.m_posX + PLAYER_SIZE, player.m_posY + PLAYER_SIZE};
+    RECT nextRect = {newPosX, newPosY, newPosX + PLAYER_SIZE, newPosY + PLAYER_SIZE};
 
     player.m_grounded = false;
 
-    for(const Tile& tile : m_level) {
+    for(const Tile& tile : m_currentLevel.m_tiles) {
         RECT intersection;
         RECT groundCheck = {currentRect.left, currentRect.bottom, currentRect.right, currentRect.bottom + 1};
-        RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + 64, tile.m_posY + 64};
+        RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + PLAYER_SIZE, tile.m_posY + PLAYER_SIZE};
         if(IntersectRect(&intersection, &groundCheck, &tileCheck)) {
             player.m_grounded = true;
         }
 
         if(IntersectRect(&intersection, &nextRect, &tileCheck)) {
             if(player.m_velY > 0 && currentRect.bottom <= tileCheck.top) {
-                newPosY = tileCheck.top - 64;
+                newPosY = tileCheck.top - PLAYER_SIZE;
                 player.m_velY = 0;
                 player.m_grounded = true;
             } else if(player.m_velY < 0 && currentRect.top >= tileCheck.bottom) {
                 newPosY = tileCheck.bottom;
                 player.m_velY = 0;
             } else if(player.m_velX > 0 && currentRect.right <= tileCheck.left) {
-                newPosX = tileCheck.left - 64;
+                newPosX = tileCheck.left - PLAYER_SIZE;
                 player.m_velX = 0;
             } else if(player.m_velX < 0 && currentRect.left >= tileCheck.right) {
                 newPosX = tileCheck.right;
@@ -112,38 +118,67 @@ void Game::Render() {
         case GameState::IN_GAME:
             RenderInGame();
             break;
+
+        case GameState::PAUSE:
+            RenderInGame();
+            RenderPause();
+            break;
     }
 }
 
 void Game::RenderMainMenu() {
     HDC hdc = GetDC(m_hwnd);
-
+    HDC hdcBuffer = CreateCompatibleDC(hdc);
+    HDC hdcMem = CreateCompatibleDC(hdc);
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
-    HBRUSH brush = CreateSolidBrush(RGB(255, 255, 255));
-    FillRect(hdc, &clientRect, brush);
-    DeleteObject(brush);
+    HBITMAP hbmBuffer = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
+    HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
 
-    buttonMainMenuPlay.Render(hdc);
-    buttonMainMenuOptions.Render(hdc);
-    buttonMainMenuExit.Render(hdc);
+    SelectObject(hdcMem, m_backgroundMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCPAINT);
+    SelectObject(hdcMem, m_backgroundMaskMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
 
+    buttonMainMenuPlay.Render(hdcBuffer);
+    buttonMainMenuOptions.Render(hdcBuffer);
+    buttonMainMenuExit.Render(hdcBuffer);
+
+    BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBuffer, 0, 0, SRCCOPY);
+
+    DeleteDC(hdcMem);
+    DeleteObject(hbmBuffer);
+    SelectObject(hdcBuffer, hbmOldBuffer);
+    DeleteObject(hbmOldBuffer);
+    DeleteDC(hdcBuffer);
     ReleaseDC(m_hwnd, hdc);
 }
 
 void Game::RenderPlayMenu() {
     HDC hdc = GetDC(m_hwnd);
-
+    HDC hdcBuffer = CreateCompatibleDC(hdc);
+    HDC hdcMem = CreateCompatibleDC(hdc);
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
-    HBRUSH brush = CreateSolidBrush(RGB(255, 255, 255));
-    FillRect(hdc, &clientRect, brush);
-    DeleteObject(brush);
+    HBITMAP hbmBuffer = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
+    HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
 
-    buttonPlayMenuGameLevels.Render(hdc);
-    buttonPlayMenuCustomLevels.Render(hdc);
-    buttonPlayMenuBack.Render(hdc);
+    SelectObject(hdcMem, m_backgroundMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCPAINT);
+    SelectObject(hdcMem, m_backgroundMaskMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
 
+    buttonPlayMenuGameLevels.Render(hdcBuffer);
+    buttonPlayMenuCustomLevels.Render(hdcBuffer);
+    buttonPlayMenuBack.Render(hdcBuffer);
+
+    BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBuffer, 0, 0, SRCCOPY);
+
+    DeleteDC(hdcMem);
+    DeleteObject(hbmBuffer);
+    SelectObject(hdcBuffer, hbmOldBuffer);
+    DeleteObject(hbmOldBuffer);
+    DeleteDC(hdcBuffer);
     ReleaseDC(m_hwnd, hdc);
 }
 
@@ -172,18 +207,18 @@ void Game::RenderInGame() {
     FillRect(hdcBuffer, &clientRect, brush);
 
     // Tiles
-    for(const Tile& tile : m_level) {
+    for(const Tile& tile : m_currentLevel.m_tiles) {
         SelectObject(hdcMem, tile.m_mask);
-        BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, 64, 64, hdcMem, 0, 0, SRCPAINT);
+        BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
         SelectObject(hdcMem, tile.m_bitmap);
-        BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, 64, 64, hdcMem, 0, 0, SRCAND);
+        BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
     }
 
     // Player
     SelectObject(hdcMem, Mahex.m_mask);
-    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, 64, 64, hdcMem, 0, 0, SRCPAINT);
+    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCPAINT);
     SelectObject(hdcMem, Mahex.m_bitmap);
-    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, 64, 64, hdcMem, 0, 0, SRCAND);
+    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCAND);
 
     BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, hdcBuffer, 0, 0, SRCCOPY);
 
@@ -197,12 +232,52 @@ void Game::RenderInGame() {
     ReleaseDC(m_hwnd, hdc);
 }
 
+void Game::RenderPause() {
+    HDC hdc = GetDC(m_hwnd);
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+
+    int rectWidth = 300;
+    int rectHeight = 200;
+    int rectX = (clientRect.right - rectWidth) / 2;
+    int finalRectY = (clientRect.bottom - rectHeight) / 2;
+
+    if(!m_animationInProgress) {
+        m_pauseMenuY = -rectHeight;
+        m_pauseTargetY = finalRectY;
+        m_animationInProgress = true;
+    }
+
+    if(m_pauseMenuY < m_pauseTargetY) {
+        m_pauseMenuY += (m_pauseTargetY - m_pauseMenuY) * 0.1f;
+        if(m_pauseTargetY - m_pauseMenuY < 0.5f) {
+            m_pauseMenuY = m_pauseTargetY;
+        }
+    }
+
+    HBRUSH whiteBrush = CreateSolidBrush(RGB(255, 255, 255));
+    RECT pauseRect = {rectX, (int) m_pauseMenuY, rectX + rectWidth, (int) m_pauseMenuY + rectHeight};
+    FillRect(hdc, &pauseRect, whiteBrush);
+
+    HPEN pen = CreatePen(PS_SOLID, 2, RGB(100, 100, 100));
+    HPEN oldPen = (HPEN) SelectObject(hdc, pen);
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
+    Rectangle(hdc, rectX, (int) m_pauseMenuY, rectX + rectWidth, (int) m_pauseMenuY + rectHeight);
+
+    DeleteObject(whiteBrush);
+    SelectObject(hdc, oldPen);
+    DeleteObject(pen);
+
+    ReleaseDC(m_hwnd, hdc);
+}
+
 void Game::CheckInput() {
     POINT mousePos;
     GetCursorPos(&mousePos);
     ScreenToClient(m_hwnd, &mousePos);
 
-    // Reset all hover states first
+    //ResetButtonHoverStates();
+
     buttonMainMenuPlay.ResetHoverState();
     buttonMainMenuOptions.ResetHoverState();
     buttonMainMenuExit.ResetHoverState();
@@ -210,7 +285,6 @@ void Game::CheckInput() {
     buttonPlayMenuCustomLevels.ResetHoverState();
     buttonPlayMenuBack.ResetHoverState();
 
-    // Then only check hover for current state's buttons
     switch(m_state) {
         case GameState::MAIN_MENU:
             buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
@@ -248,8 +322,23 @@ void Game::CheckInput() {
         Mahex.m_velY = 0;
     }
 
-    if(IsKeyPressed('T')) {
-        m_state = GameState::IN_GAME;
+    if(IsKeyPressed(VK_ESCAPE)) {
+        if(!m_escapeButtonPressed) {
+            m_escapeButtonPressed = true;
+            if(m_state == GameState::IN_GAME) {
+                m_state = GameState::PAUSE;
+            } else if(m_state == GameState::PAUSE) {
+                m_state = GameState::IN_GAME;
+                m_animationInProgress = false;
+            }
+        }
+    } else {
+        m_escapeButtonPressed = false;
+    }
+
+    if(IsKeyPressed(VK_BACK)) {
+        if(m_state == GameState::IN_GAME)
+            m_state = GameState::PLAY_MENU;
     }
 
     if(IsKeyPressed('Q')) {
@@ -257,14 +346,16 @@ void Game::CheckInput() {
     }
 
     if(IsKeyPressed(VK_LBUTTON)) {
-        ProcessMouseClick(mousePos);
+        if(!m_mouseButtonPressed) {
+            m_mouseButtonPressed = true;
+            ProcessMouseClick(mousePos);
+        }
+    } else {
+        m_mouseButtonPressed = false;
     }
 }
 
 void Game::ProcessMouseClick(POINT mousePos) {
-    if(m_state == GameState::MAIN_MENU) MessageBox(m_hwnd, L"Game state: MAIN_MENU", L"Mouse clicked", MB_OK);
-    else MessageBox(m_hwnd, L"Game state: PLAY_MENU", L"Mouse clicked", MB_OK);
-
     switch(m_state) {
         case GameState::MAIN_MENU:
             if(buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y)) {
@@ -289,6 +380,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 buttonPlayMenuBack.ResetHoverState();
                 //m_state = GameState::GAME_LEVELS;
                 m_state = GameState::IN_GAME;
+                LoadLevel();
             } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
                 buttonPlayMenuGameLevels.ResetHoverState();
                 buttonPlayMenuCustomLevels.ResetHoverState();
@@ -308,6 +400,51 @@ void Game::ProcessMouseClick(POINT mousePos) {
         case GameState::OPTIONS:
         case GameState::IN_GAME:
             break;
+    }
+}
+
+void Game::LoadLevel() {
+    Mahex.m_posX = m_currentLevel.m_startingPoint.x;
+    Mahex.m_posY = m_currentLevel.m_startingPoint.y;
+    Mahex.m_velX = 0;
+    Mahex.m_velY = 0;
+    Mahex.m_grounded = false;
+}
+
+bool Game::LoadCustomFont() {
+    m_fontHandle = (HANDLE) AddFontResourceEx(L"assets/fonts/pixel.ttf", FR_PRIVATE, 0);
+    if(m_fontHandle == 0) {
+        return false;
+    }
+
+    m_customFont = CreateFont(
+        32,
+        0,
+        0,
+        0,
+        FW_NORMAL,
+        FALSE,
+        FALSE,
+        FALSE,
+        DEFAULT_CHARSET,
+        OUT_TT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        CLEARTYPE_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE,
+        L"pixel"
+    );
+
+    return m_customFont != nullptr;
+}
+
+void Game::CleanupFont() {
+    if(m_customFont) {
+        DeleteObject(m_customFont);
+        m_customFont = nullptr;
+    }
+    if(m_fontHandle) {
+        RemoveFontResourceEx(L"assets/fonts/YourFont.ttf", FR_PRIVATE, 0);
+        m_fontHandle = nullptr;
     }
 }
 

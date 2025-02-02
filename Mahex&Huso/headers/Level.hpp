@@ -8,6 +8,7 @@
 
 struct Level {
 	std::vector<Tile> m_tiles;
-	Tile m_startingTileMahex;
-	Tile m_startingTileHuso;
+	POINT m_startingPoint;
+
+	Level() = default;
 };

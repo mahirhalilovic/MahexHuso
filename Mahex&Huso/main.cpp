@@ -73,9 +73,9 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
         _T("Mahex&Huso"),                                           // Title Text
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,   // Non-resizable window
         152,                                                        // Center the window assuming
-        50,                                                         // screen size is 1920x1080
-        1616,                                                       // Window width
-        939,                                                        // and height considering border and ribbon
+        50,                                                         // screen size is 1200x720
+        WINDOW_WIDTH+16,                                            // Window width
+        WINDOW_HEIGHT+39,                                           // and height considering border and ribbon
         HWND_DESKTOP,                                               // The window is a child-window to desktop
         NULL,                                                       // No menu
         hThisInstance,                                              // Program Instance handler
@@ -103,7 +103,6 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
         deltaTime = currentTime - previousTime;
 
         if(deltaTime >= 1000 / FPS_MAX) {
-            // Update and render directly
             game.Update();
             game.Render();
 
