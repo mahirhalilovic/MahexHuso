@@ -135,6 +135,7 @@
     <ClInclude Include="Display.hpp" />
     <ClInclude Include="headers\Button.hpp" />
     <ClInclude Include="headers\Game.hpp" />
+    <ClInclude Include="headers\json.hpp" />
     <ClInclude Include="headers\Level.hpp" />
     <ClInclude Include="headers\Object.hpp" />
     <ClInclude Include="headers\Player.hpp" />
@@ -143,6 +144,9 @@
   <ItemGroup>
     <Image Include="assets\images\tile.bmp" />
     <Image Include="assets\images\tile_mask.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="levels\level1.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

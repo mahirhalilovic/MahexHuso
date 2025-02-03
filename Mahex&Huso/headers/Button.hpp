@@ -31,6 +31,11 @@ class Button {
         );
     }
 
+    void SetPos(int posX, int posY) {
+        x = posX;
+        y = posY;
+    }
+
     bool IsMouseOver(int mouseX, int mouseY) {
         return mouseX >= x && mouseX <= x + width &&
             mouseY >= y && mouseY <= y + height;

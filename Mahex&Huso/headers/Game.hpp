@@ -1,11 +1,15 @@
 #pragma once
 
 #include <windows.h>
+#include <fstream>
+#include "json.hpp"
 
 #include "Player.hpp"
 #include "Level.hpp"
 #include "Display.hpp"
 #include "Button.hpp"
+
+using json = nlohmann::json;
 
 #define IsKeyPressed(x) (GetAsyncKeyState(x) & 0x8000 ? 1 : 0)
 
@@ -41,22 +45,24 @@ class Game {
 		GameState m_state = GameState::MAIN_MENU;
 		HWND m_hwnd;
 		Player Mahex;
-		//Player Huso;
-		//std::vector<Level> m_levels;
-		Level m_currentLevel;
+		Level m_currentLevel, m_loadedLevel;
+		bool levelLoadSuccessful = false;
 		Display m_display;
 
 		HBITMAP m_backgroundMainMenu;
 		HBITMAP m_backgroundMaskMainMenu;
+		HBITMAP m_backgroundPauseMenu;
+		HBITMAP m_backgroundMaskPauseMenu;
 
 		bool m_escapeButtonPressed = false;
-		float m_pauseMenuY = -200.0f;
+		float m_pauseMenuY = -300.0f;
 		float m_pauseTargetY = 0.0f;
 		bool m_animationInProgress = false;
 
 		bool m_mouseButtonPressed = false;
 		Button buttonMainMenuPlay, buttonMainMenuOptions, buttonMainMenuExit;
 		Button buttonPlayMenuGameLevels, buttonPlayMenuCustomLevels, buttonPlayMenuBack;
+		Button buttonPauseMenuResume, buttonPauseMenuRestart, buttonPauseMenuOptions, buttonPauseMenuQuit;
 
 		HANDLE m_fontHandle = nullptr;
 		HFONT m_customFont = nullptr;
@@ -79,9 +85,10 @@ class Game {
 		void ProcessMouseClick(POINT);
 
 		void LoadLevel();
+		bool LoadLevelFromJSON(std::string);
 
-		bool LoadCustomFont();
-		void CleanupFont();
+		//bool LoadCustomFont();
+		//void CleanupFont();
 
 		bool ToggleFullScreen();
 		bool ToggleFullScreen(bool);

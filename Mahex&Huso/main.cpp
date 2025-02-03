@@ -15,7 +15,7 @@
 // [+] Draw character sprites and tiles
 // [+] Create testing level
 // [+] Prevent movement outside of borders
-// [-] Design basic game level to test out collisions and movement
+// [+] Design basic game level to test out collisions and movement
 // [-] Add cooperative mechanics(other player)
 // [-] Implement end goals
 // [-] Add obstacles
