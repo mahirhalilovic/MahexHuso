@@ -33,11 +33,14 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    0.f, 0.f, true, 0, IDLE};
+
+    m_levelEditor = LevelEditor(m_hwnd);
 }
 
 void Game::Update() {
     CheckInput();
     if(m_state == GameState::IN_GAME) UpdatePlayer(Mahex);
+    else if(m_state == GameState::CUSTOM_LEVELS) m_levelEditor.Update();
     //UpdatePlayer(Huso);
 }
 
@@ -182,9 +185,13 @@ void Game::RenderPlayMenu() {
 
 void Game::RenderGameLevels() {}
 
-void Game::RenderCustomLevels() {}
+void Game::RenderCustomLevels() {
+    m_levelEditor.Render();
+}
 
-void Game::RenderLevelEditor() {}
+void Game::RenderLevelEditor() {
+    m_levelEditor.Render();
+}
 
 void Game::RenderOptions() {}
 
@@ -337,6 +344,8 @@ void Game::CheckInput() {
             } else if(m_state == GameState::PAUSE) {
                 m_state = GameState::IN_GAME;
                 m_animationInProgress = false;
+            } else if(m_state == GameState::CUSTOM_LEVELS) {
+                m_state = GameState::MAIN_MENU;
             }
         }
     } else {

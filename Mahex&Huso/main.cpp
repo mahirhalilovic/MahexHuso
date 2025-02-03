@@ -19,9 +19,9 @@
 // [-] Add cooperative mechanics(other player)
 // [-] Implement end goals
 // [-] Add obstacles
-// [-] Level restarting
+// [+] Level restarting
 // [-] Implement score mechanics
-// [-] Add main menu
+// [+] Add main menu
 // [-] Add sound effects and music
 // [-] Implement custom level creator
 // [-] Implement custom level saving, making own files

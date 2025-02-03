@@ -8,6 +8,7 @@
 #include "Level.hpp"
 #include "Display.hpp"
 #include "Button.hpp"
+#include "LevelEditor.hpp"
 
 using json = nlohmann::json;
 
@@ -47,6 +48,7 @@ class Game {
 		Player Mahex;
 		Level m_currentLevel, m_loadedLevel;
 		bool levelLoadSuccessful = false;
+		LevelEditor m_levelEditor;
 		Display m_display;
 
 		HBITMAP m_backgroundMainMenu;
