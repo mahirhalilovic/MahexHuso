@@ -142,13 +142,14 @@
     <ClInclude Include="headers\Object.hpp" />
     <ClInclude Include="headers\Player.hpp" />
     <ClInclude Include="headers\Tiles.hpp" />
+    <ClInclude Include="resources.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\tile.bmp" />
     <Image Include="assets\images\tile_mask.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="levels\level1.json" />
+    <ResourceCompile Include="resources.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

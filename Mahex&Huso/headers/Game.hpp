@@ -9,12 +9,12 @@
 #include "Display.hpp"
 #include "Button.hpp"
 #include "LevelEditor.hpp"
+#include "../resources.h"
 
 using json = nlohmann::json;
 
-#define IsKeyPressed(x) (GetAsyncKeyState(x) & 0x8000 ? 1 : 0)
-
 #define WINDOW_WIDTH 1200
+#define WINDOW_WIDTH_EDITOR 1600
 #define WINDOW_HEIGHT 720
 
 #define TILE_SIZE 48
@@ -23,7 +23,7 @@ using json = nlohmann::json;
 #define FPS_MAX 60
 
 #define MOVE_SPEED 5
-#define JUMP_HEIGHT 8
+#define JUMP_HEIGHT 10
 
 class Game {
 	public:
@@ -45,11 +45,12 @@ class Game {
 
 		GameState m_state = GameState::MAIN_MENU;
 		HWND m_hwnd;
-		Player Mahex;
 		Level m_currentLevel, m_loadedLevel;
 		bool levelLoadSuccessful = false;
 		LevelEditor m_levelEditor;
 		Display m_display;
+
+		Player Mahex, Huso;
 
 		HBITMAP m_backgroundMainMenu;
 		HBITMAP m_backgroundMaskMainMenu;
@@ -88,6 +89,8 @@ class Game {
 
 		void LoadLevel();
 		bool LoadLevelFromJSON(std::string);
+
+		void UpdateWindowSize(bool isEditor);
 
 		//bool LoadCustomFont();
 		//void CleanupFont();

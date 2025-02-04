@@ -33,15 +33,23 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    0.f, 0.f, true, 0, IDLE};
-
-    m_levelEditor = LevelEditor(m_hwnd);
+    Huso = Player{0, 0,
+                   (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                   (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                   0.f, 0.f, true, 0, IDLE};
 }
 
 void Game::Update() {
     CheckInput();
     if(m_state == GameState::IN_GAME) UpdatePlayer(Mahex);
-    else if(m_state == GameState::CUSTOM_LEVELS) m_levelEditor.Update();
-    //UpdatePlayer(Huso);
+    else if(m_state == GameState::CUSTOM_LEVELS) {
+        m_levelEditor.Update();
+        if(m_levelEditor.shouldExitToMainMenu) {
+            UpdateWindowSize(false);
+            m_state = GameState::MAIN_MENU;
+            m_levelEditor.shouldExitToMainMenu = false;
+        }
+    }
 }
 
 void Game::UpdatePlayer(Player &player) {
@@ -63,7 +71,7 @@ void Game::UpdatePlayer(Player &player) {
     for(const Tile& tile : m_currentLevel.m_tiles) {
         RECT intersection;
         RECT groundCheck = {currentRect.left, currentRect.bottom, currentRect.right, currentRect.bottom + 1};
-        RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + PLAYER_SIZE, tile.m_posY + PLAYER_SIZE};
+        RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + TILE_SIZE, tile.m_posY + TILE_SIZE};
         if(IntersectRect(&intersection, &groundCheck, &tileCheck)) {
             player.m_grounded = true;
         }
@@ -346,6 +354,7 @@ void Game::CheckInput() {
                 m_animationInProgress = false;
             } else if(m_state == GameState::CUSTOM_LEVELS) {
                 m_state = GameState::MAIN_MENU;
+                UpdateWindowSize(false);
             }
         }
     } else {
@@ -396,7 +405,9 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 buttonPlayMenuGameLevels.ResetHoverState();
                 buttonPlayMenuCustomLevels.ResetHoverState();
                 buttonPlayMenuBack.ResetHoverState();
+                m_levelEditor = LevelEditor(m_hwnd);
                 m_state = GameState::CUSTOM_LEVELS;
+                UpdateWindowSize(true);
             } else if(buttonPlayMenuBack.IsMouseOver(mousePos.x, mousePos.y)) {
                 buttonPlayMenuGameLevels.ResetHoverState();
                 buttonPlayMenuCustomLevels.ResetHoverState();
@@ -445,11 +456,17 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
 void Game::LoadLevel() {
     if(LoadLevelFromJSON("levels/level1.json")) {
-        Mahex.m_posX = m_currentLevel.m_startingPoint.x;
-        Mahex.m_posY = m_currentLevel.m_startingPoint.y;
+        Mahex.m_posX = m_currentLevel.m_startMahex.x;
+        Mahex.m_posY = m_currentLevel.m_startMahex.y;
         Mahex.m_velX = 0;
         Mahex.m_velY = 0;
         Mahex.m_grounded = false;
+
+        Huso.m_posX = m_currentLevel.m_startHuso.x;
+        Huso.m_posY = m_currentLevel.m_startHuso.y;
+        Huso.m_velX = 0;
+        Huso.m_velY = 0;
+        Huso.m_grounded = false;
     }
 }
 
@@ -494,14 +511,41 @@ bool Game::LoadLevelFromJSON(std::string path) {
             m_currentLevel.m_tiles.push_back(tile);
         }
 
-        m_currentLevel.m_startingPoint.x = levelData["starting_point"]["x"].get<int>();
-        m_currentLevel.m_startingPoint.y = levelData["starting_point"]["y"].get<int>();
+        m_currentLevel.m_startMahex.x = levelData["start_points"]["mahex"]["x"].get<int>();
+        m_currentLevel.m_startMahex.y = levelData["start_points"]["mahex"]["y"].get<int>();
+        m_currentLevel.m_endMahex.x = levelData["end_points"]["mahex"]["x"].get<int>();
+        m_currentLevel.m_endMahex.y = levelData["end_points"]["mahex"]["y"].get<int>();
+        m_currentLevel.m_startHuso.x = levelData["start_points"]["huso"]["x"].get<int>();
+        m_currentLevel.m_startHuso.y = levelData["start_points"]["huso"]["y"].get<int>();
+        m_currentLevel.m_endHuso.x = levelData["end_points"]["huso"]["x"].get<int>();
+        m_currentLevel.m_endHuso.y = levelData["end_points"]["huso"]["y"].get<int>();
 
         return true;
 
     } catch(const std::exception& e) {
         MessageBoxA(NULL, e.what(), "Error", MB_OK | MB_ICONERROR);
         return false;
+    }
+}
+
+void Game::UpdateWindowSize(bool isEditor) {
+    RECT windowRect;
+    GetWindowRect(m_hwnd, &windowRect);
+    int currentX = windowRect.left;
+    int currentY = windowRect.top;
+
+    if(isEditor) {
+        // Move left by 200 and increase width by 400 for editor
+        SetWindowPos(m_hwnd, NULL,
+            currentX - 200, currentY,
+            WINDOW_WIDTH_EDITOR + 16, WINDOW_HEIGHT + 39,
+            SWP_NOZORDER);
+    } else {
+        // Restore original position and size
+        SetWindowPos(m_hwnd, NULL,
+            currentX + 200, currentY,
+            WINDOW_WIDTH + 16, WINDOW_HEIGHT + 39,
+            SWP_NOZORDER);
     }
 }
 

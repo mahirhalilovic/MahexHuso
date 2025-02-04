@@ -8,7 +8,8 @@
 
 struct Level {
 	std::vector<Tile> m_tiles;
-	POINT m_startingPoint;
+	POINT m_startMahex, m_startHuso;
+	POINT m_endMahex, m_endHuso;
 
 	Level() = default;
 };

@@ -72,8 +72,8 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
         _T("Mahex&Huso"),                                           // Classname
         _T("Mahex&Huso"),                                           // Title Text
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,   // Non-resizable window
-        152,                                                        // Center the window assuming
-        50,                                                         // screen size is 1200x720
+        252,                                                        // Center the window assuming
+        120,                                                        // screen size is 1200x720
         WINDOW_WIDTH+16,                                            // Window width
         WINDOW_HEIGHT+39,                                           // and height considering border and ribbon
         HWND_DESKTOP,                                               // The window is a child-window to desktop
