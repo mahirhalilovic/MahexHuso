@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 struct Object {
+	public:
 	int m_posX = 0;
 	int m_posY = 0;
 

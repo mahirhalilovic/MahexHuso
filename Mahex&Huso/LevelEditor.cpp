@@ -1,120 +1,610 @@
 #include "headers/LevelEditor.hpp"
 
-LevelEditor::LevelEditor(HWND hwnd) : m_hwndMainWindow{hwnd} {
+LevelEditor::LevelEditor(HWND hwnd) : m_hwnd{hwnd} {
+    m_tileBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/tile.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_tileMask = (HBITMAP) LoadImage(NULL, L"assets/images/tile_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_spikesBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/spikes.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_spikesMask = (HBITMAP) LoadImage(NULL, L"assets/images/spikes_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_coinBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/coin.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_coinMask = (HBITMAP) LoadImage(NULL, L"assets/images/coin_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    m_keydownBlockBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/keydown.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_keydownBlockMask = (HBITMAP) LoadImage(NULL, L"assets/images/keydown_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_pressureBlockBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/pressure.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_pressureBlockMask = (HBITMAP) LoadImage(NULL, L"assets/images/pressure_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_plateHorizontalBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/horizontal_plate.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_plateHorizontalMask = (HBITMAP) LoadImage(NULL, L"assets/images/horizontal_plate_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_plateVerticalBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/vertical_plate.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_plateVerticalMask = (HBITMAP) LoadImage(NULL, L"assets/images/vertical_plate_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    m_mahexEndBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/door_mahex.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_mahexEndMask = (HBITMAP) LoadImage(NULL, L"assets/images/door_mahex_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_husoEndBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/door_huso.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_husoEndMask = (HBITMAP) LoadImage(NULL, L"assets/images/door_huso_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    if(!m_tileBitmap || !m_tileMask) {
+        MessageBox(NULL, L"Failed to load tile images", L"Error", MB_OK);
+    }
+    if(!m_spikesBitmap || !m_spikesMask) {
+        MessageBox(NULL, L"Failed to load spikes images", L"Error", MB_OK);
+    }
+    if(!m_coinBitmap || !m_coinMask) {
+        MessageBox(NULL, L"Failed to load coin images", L"Error", MB_OK);
+    }
+    if(!m_keydownBlockBitmap || !m_keydownBlockMask) {
+        MessageBox(NULL, L"Failed to load keydown images", L"Error", MB_OK);
+    }
+    if(!m_pressureBlockBitmap || !m_pressureBlockMask) {
+        MessageBox(NULL, L"Failed to load pressure images", L"Error", MB_OK);
+    }
+    if(!m_plateHorizontalBitmap || !m_plateHorizontalMask) {
+        MessageBox(NULL, L"Failed to load plate images", L"Error", MB_OK);
+    }
+    if(!m_plateVerticalBitmap || !m_plateVerticalMask) {
+        MessageBox(NULL, L"Failed to load plate images", L"Error", MB_OK);
+    }
+    if(!m_mahexEndBitmap || !m_mahexEndMask) {
+        MessageBox(NULL, L"Failed to load mahex door images", L"Error", MB_OK);
+    }
+    if(!m_husoEndBitmap || !m_husoEndMask) {
+        MessageBox(NULL, L"Failed to load huso door images", L"Error", MB_OK);
+    }
+
     m_gridWidth = 25;
     m_gridHeight = 15;
-    m_selectedTile = TileType::TILE;
-    m_grid.resize(m_gridWidth, std::vector<TileType>(m_gridHeight, TileType::NONE));
+    m_selectedTile = TileType::NONE;
+    m_selectedOrientation = Orientation::HORIZONTAL;
+    m_currentID = 0;
+    m_grid.resize(m_gridWidth, std::vector<Tile>(m_gridHeight));
 
     m_mahexStart = m_mahexEnd = {-1, -1};
     m_husoStart = m_husoEnd = {-1, -1};
 
+    m_selectedMenu = LevelEditorMenu::TILES;
+    ConstructButtons();
+}
+
+void LevelEditor::ConstructButtons() {
+    // Menu buttons
+    m_buttonMenuTile = Button(1220, 20, 100, 50, L"TILES");
+    m_buttonMenuMechanical = Button(1350, 20, 100, 50, L"MECHANICAL");
+    m_buttonMenuPlayer = Button(1480, 20, 100, 50, L"PLAYER");
+
+    // Tile buttons
+    m_buttonTile = Button(1250, 120, 200, 50, L"TILE");
+    m_buttonSpikes = Button(1250, 190, 200, 50, L"SPIKES");
+    m_buttonCoin = Button(1250, 260, 200, 50, L"COIN");
+
+    // Mechanical buttons
+    m_buttonKeydownBlock = Button(1250, 120, 200, 50, L"KEYDOWN BLOCK");
+    m_buttonPressureBlock = Button(1250, 190, 200, 50, L"PRESSURE BLOCK");
+    m_buttonHorizontal = Button(1250, 300, 125, 50, L"HORIZONTAL");
+    m_buttonVertical = Button(1425, 300, 125, 50, L"VERTICAL");
+
+    // Player buttons
+    m_buttonMahexStart = Button(1250, 120, 200, 50, L"MAHEX START");
+    m_buttonMahexEnd = Button(1250, 190, 200, 50, L"MAHEX END");
+    m_buttonHusoStart = Button(1250, 260, 200, 50, L"HUSO START");
+    m_buttonHusoEnd = Button(1250, 330, 200, 50, L"HUSO END");
+
+    // Footer buttons
     m_buttonCancel = Button(1220, 650, 100, 50, L"CANCEL");
     m_buttonEdit = Button(1350, 650, 100, 50, L"EDIT");
     m_buttonSave = Button(1480, 650, 100, 50, L"SAVE");
 
-    m_buttonCancel.SetFont(L"i pixel u", 26, false);
-    m_buttonEdit.SetFont(L"i pixel u", 26, false);
-    m_buttonSave.SetFont(L"i pixel u", 26, false);
+    //m_buttonCancel.SetFont(L"i pixel u", 26, false);
+    //m_buttonEdit.SetFont(L"i pixel u", 26, false);
+    //m_buttonSave.SetFont(L"i pixel u", 26, false);
+    //m_buttonTile.SetFont(L"i pixel u", 26, false);
+    //m_buttonMahexStart.SetFont(L"i pixel u", 26, false);
+    //m_buttonMahexEnd.SetFont(L"i pixel u", 26, false);
+    //m_buttonHusoStart.SetFont(L"i pixel u", 26, false);
+    //m_buttonHusoEnd.SetFont(L"i pixel u", 26, false);
+}
+
+void LevelEditor::RenderButtons(const HDC &hdc) {
+    m_buttonMenuTile.Render(hdc);
+    m_buttonMenuMechanical.Render(hdc);
+    m_buttonMenuPlayer.Render(hdc);
+
+    switch(m_selectedMenu) {
+        case LevelEditorMenu::TILES:
+            m_buttonTile.Render(hdc);
+            m_buttonSpikes.Render(hdc);
+            m_buttonCoin.Render(hdc);
+            break;
+
+        case LevelEditorMenu::MECHANICAL:
+            m_buttonKeydownBlock.Render(hdc);
+            m_buttonPressureBlock.Render(hdc);
+            m_buttonVertical.Render(hdc);
+            m_buttonHorizontal.Render(hdc);
+            break;
+
+        case LevelEditorMenu::PLAYER:
+            m_buttonMahexStart.Render(hdc);
+            m_buttonMahexEnd.Render(hdc);
+            m_buttonHusoStart.Render(hdc);
+            m_buttonHusoEnd.Render(hdc);
+            break;
+    }
+
+    m_buttonCancel.Render(hdc);
+    m_buttonEdit.Render(hdc);
+    m_buttonSave.Render(hdc);
+}
+
+void LevelEditor::RenderTiling(const HDC &hdc, const HDC &hdcBuffer) {
+    HDC hdcMem = CreateCompatibleDC(hdc);
+
+    switch(m_selectedMenu) {
+        case LevelEditorMenu::TILES:
+            SelectObject(hdcMem, m_tileMask);
+            BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_tileBitmap);
+            BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCAND);
+            SelectObject(hdcMem, m_spikesBitmap);
+            BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_spikesMask);
+            BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCAND);
+            SelectObject(hdcMem, m_coinBitmap);
+            BitBlt(hdcBuffer, 1517, 277, 16, 16, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_coinMask);
+            BitBlt(hdcBuffer, 1517, 277, 16, 16, hdcMem, 0, 0, SRCAND);
+            break;
+
+        case LevelEditorMenu::MECHANICAL:
+            SelectObject(hdcMem, m_keydownBlockBitmap);
+            BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_keydownBlockMask);
+            BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCAND);
+            SelectObject(hdcMem, m_pressureBlockBitmap);
+            BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_pressureBlockMask);
+            BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCAND);
+            break;
+
+        case LevelEditorMenu::PLAYER:
+            SelectObject(hdcMem, m_mahexEndBitmap);
+            BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_mahexEndMask);
+            BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCAND);
+            SelectObject(hdcMem, m_husoEndBitmap);
+            BitBlt(hdcBuffer, 1501, 331, 48, 48, hdcMem, 0, 0, SRCPAINT);
+            SelectObject(hdcMem, m_husoEndMask);
+            BitBlt(hdcBuffer, 1501, 331, 48, 48, hdcMem, 0, 0, SRCAND);
+            break;
+    }
+
+    DeleteDC(hdcMem);
+}
+
+void LevelEditor::RenderTiles(const HDC &hdc, const HDC &hdcBuffer) {
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    HBRUSH mahexStartBrush = CreateSolidBrush(0xff);
+    HBRUSH husoStartBrush = CreateSolidBrush(0xff0000);
+
+    for(int x = 0; x < m_gridWidth; x++) {
+        for(int y = 0; y < m_gridHeight; y++) {
+            TileType tileType = m_grid[x][y].m_type;
+            if(tileType != TileType::NONE) {
+                RECT rect = {
+                    x * 48,
+                    y * 48,
+                    (x + 1) * 48,
+                    (y + 1) * 48
+                };
+                RECT plate;
+
+                HBRUSH brush = nullptr;
+
+                switch(tileType) {
+                    case TileType::TILE:
+                        SelectObject(hdcMem, m_tileBitmap);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_tileMask);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
+                        break;
+                    case TileType::SPIKES:
+                        SelectObject(hdcMem, m_spikesBitmap);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_spikesMask);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
+                        break;
+                    case TileType::COIN:
+                        SelectObject(hdcMem, m_coinBitmap);
+                        BitBlt(hdcBuffer, rect.left + 16, rect.top + 16, 16, 16, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_coinMask);
+                        BitBlt(hdcBuffer, rect.left + 16, rect.top + 16, 16, 16, hdcMem, 0, 0, SRCAND);
+                        break;
+                    case TileType::KEYDOWN_BLOCK:
+                        SelectObject(hdcMem, m_keydownBlockBitmap);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_keydownBlockMask);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
+                        break;
+                    case TileType::KEYDOWN_PLATE:
+                    case TileType::PRESSURE_PLATE_START:
+                        if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
+                            SelectObject(hdcMem, m_plateHorizontalBitmap);
+                            BitBlt(hdcBuffer, rect.left, rect.top + 16, 48, 16, hdcMem, 0, 0, SRCPAINT);
+                            SelectObject(hdcMem, m_plateHorizontalMask);
+                            BitBlt(hdcBuffer, rect.left, rect.top + 16, 48, 16, hdcMem, 0, 0, SRCAND);
+                        } else {
+                            SelectObject(hdcMem, m_plateVerticalBitmap);
+                            BitBlt(hdcBuffer, rect.left + 16, rect.top, 16, 48, hdcMem, 0, 0, SRCPAINT);
+                            SelectObject(hdcMem, m_plateVerticalMask);
+                            BitBlt(hdcBuffer, rect.left + 16, rect.top, 16, 48, hdcMem, 0, 0, SRCAND);
+                        }
+                        break;
+                    case TileType::PRESSURE_BLOCK:
+                        SelectObject(hdcMem, m_pressureBlockBitmap);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_pressureBlockMask);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
+                        break;
+                    case TileType::PRESSURE_PLATE_END:
+                        if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
+                            rect.top = rect.top + 16;
+                            rect.bottom = rect.bottom - 16;
+                            brush = CreateSolidBrush(0xbf40bf);
+                        } else {
+                            rect.left = rect.left + 16;
+                            rect.right = rect.right - 16;
+                            brush = CreateSolidBrush(0xbf40bf);
+                        }
+                        break;
+                    case TileType::MAHEX_START:
+                        brush = mahexStartBrush;
+                        break;
+                    case TileType::MAHEX_END:
+                        SelectObject(hdcMem, m_mahexEndBitmap);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_mahexEndMask);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
+                        break;
+                    case TileType::HUSO_START:
+                        brush = husoStartBrush;
+                        break;
+                    case TileType::HUSO_END:
+                        SelectObject(hdcMem, m_husoEndBitmap);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
+                        SelectObject(hdcMem, m_husoEndMask);
+                        BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
+                        break;
+                }
+
+                if(brush) {
+                    FillRect(hdcBuffer, &rect, brush);
+                    DeleteObject(brush);
+                }
+            }
+        }
+    }
+
+    DeleteObject(mahexStartBrush);
+    DeleteObject(husoStartBrush);
+    DeleteDC(hdcMem);
+}
+
+void LevelEditor::CheckHoverStatus(const POINT &mousePos) {
+    m_buttonMenuTile.ResetHoverState();
+    m_buttonMenuMechanical.ResetHoverState();
+    m_buttonMenuPlayer.ResetHoverState();
+
+    m_buttonTile.ResetHoverState();
+    m_buttonSpikes.ResetHoverState();
+    m_buttonCoin.ResetHoverState();
+
+    m_buttonKeydownBlock.ResetHoverState();
+    m_buttonPressureBlock.ResetHoverState();
+    m_buttonVertical.ResetHoverState();
+    m_buttonHorizontal.ResetHoverState();
+
+    m_buttonMahexStart.ResetHoverState();
+    m_buttonMahexEnd.ResetHoverState();
+    m_buttonHusoStart.ResetHoverState();
+    m_buttonHusoEnd.ResetHoverState();
+
+    m_buttonCancel.ResetHoverState();
+    m_buttonEdit.ResetHoverState();
+    m_buttonSave.ResetHoverState();
+
+    m_buttonMenuTile.hovered = m_buttonMenuTile.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonMenuMechanical.hovered = m_buttonMenuMechanical.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonMenuPlayer.hovered = m_buttonMenuPlayer.IsMouseOver(mousePos.x, mousePos.y);
+
+    m_buttonTile.hovered = m_buttonTile.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonSpikes.hovered = m_buttonSpikes.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonCoin.hovered = m_buttonCoin.IsMouseOver(mousePos.x, mousePos.y);
+
+    m_buttonKeydownBlock.hovered = m_buttonKeydownBlock.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonPressureBlock.hovered = m_buttonPressureBlock.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonVertical.hovered = m_buttonVertical.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonHorizontal.hovered = m_buttonHorizontal.IsMouseOver(mousePos.x, mousePos.y);
+
+    m_buttonMahexStart.hovered = m_buttonMahexStart.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonMahexEnd.hovered = m_buttonMahexEnd.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonHusoStart.hovered = m_buttonHusoStart.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonHusoEnd.hovered = m_buttonHusoEnd.IsMouseOver(mousePos.x, mousePos.y);
+
+    m_buttonCancel.hovered = m_buttonCancel.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonEdit.hovered = m_buttonEdit.IsMouseOver(mousePos.x, mousePos.y);
+    m_buttonSave.hovered = m_buttonSave.IsMouseOver(mousePos.x, mousePos.y);
+}
+
+void LevelEditor::CheckMousePress(const POINT &mousePos) {
+    if(m_buttonSave.IsMouseOver(mousePos.x, mousePos.y)) {
+        std::string filePath;
+        if(ShowSaveFileDialog(filePath)) {
+            if(SaveToFile(filePath)) {
+                MessageBox(NULL, L"Level saved successfully!", L"Success", MB_OK);
+                shouldExitToMainMenu = true;
+                return;
+            }
+        }
+    } else if(m_buttonEdit.IsMouseOver(mousePos.x, mousePos.y)) {
+        std::string filePath;
+        if(ShowOpenFileDialog(filePath)) {
+            LoadFromFile(filePath);
+            return;
+        }
+    } else if(m_buttonCancel.IsMouseOver(mousePos.x, mousePos.y)) {
+        shouldExitToMainMenu = true;
+        return;
+    } else if(m_buttonMenuTile.IsMouseOver(mousePos.x, mousePos.y)) {
+        RemoveNonFinishedMechanicalTile();
+        m_selectedMenu = LevelEditorMenu::TILES;
+    } else if(m_buttonMenuMechanical.IsMouseOver(mousePos.x, mousePos.y)) {
+        RemoveNonFinishedMechanicalTile();
+        m_selectedMenu = LevelEditorMenu::MECHANICAL;
+    } else if(m_buttonMenuPlayer.IsMouseOver(mousePos.x, mousePos.y)) {
+        RemoveNonFinishedMechanicalTile();
+        m_selectedMenu = LevelEditorMenu::PLAYER;
+    }
+
+    switch(m_selectedMenu) {
+        case LevelEditorMenu::TILES:
+            if(m_buttonTile.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::TILE;
+            } else if(m_buttonSpikes.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::SPIKES;
+            } else if(m_buttonCoin.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::COIN;
+            }
+            break;
+
+        case LevelEditorMenu::MECHANICAL:
+            if(m_buttonKeydownBlock.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::KEYDOWN_BLOCK;
+            } else if(m_buttonPressureBlock.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::PRESSURE_BLOCK;
+            } else if(m_buttonHorizontal.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_selectedOrientation = Orientation::HORIZONTAL;
+            } else if(m_buttonVertical.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_selectedOrientation = Orientation::VERTICAL;
+            }
+            break;
+
+        case LevelEditorMenu::PLAYER:
+            if(m_buttonMahexStart.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::MAHEX_START;
+            } else if(m_buttonMahexEnd.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::MAHEX_END;
+            } else if(m_buttonHusoStart.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::HUSO_START;
+            } else if(m_buttonHusoEnd.IsMouseOver(mousePos.x, mousePos.y)) {
+                RemoveNonFinishedMechanicalTile();
+                m_selectedTile = TileType::HUSO_END;
+            }
+            break;
+    }
+}
+
+void LevelEditor::RemoveNonFinishedMechanicalTile() {
+    for(int i = 0; i < m_grid.size(); ++i) {
+        for(int j = 0; j < m_grid[i].size(); ++j) {
+            if(m_grid[i][j].m_id == m_currentID) {
+                TileType type = m_grid[i][j].m_type;
+                if(type == TileType::KEYDOWN_BLOCK || type == TileType::KEYDOWN_PLATE ||
+                    type == TileType::PRESSURE_BLOCK || type == TileType::PRESSURE_PLATE_START || type == TileType::PRESSURE_PLATE_END) {
+                    m_grid[i][j].m_type = TileType::NONE;
+                }
+            }
+        }
+    }
+    m_mechanicalTileInProgress = false;
 }
 
 void LevelEditor::SetTile(int x, int y, TileType tileType) {
-    TileType currentTile = GetTile(x, y);
+    TileType currentTile = GetTile(x, y).m_type;
 
     if(x >= 0 && x < m_gridWidth && y >= 0 && y < m_gridHeight) {
         switch(currentTile) {
-            case TileType::MAHEX_START_POINT:
+            case TileType::MAHEX_START:
                 m_mahexStart = {-1, -1};
                 break;
-            case TileType::MAHEX_END_POINT:
-                m_mahexEnd = {-1, -1};
-                break;
-            case TileType::HUSO_START_POINT:
+            case TileType::HUSO_START:
                 m_husoStart = {-1, -1};
-                break;
-            case TileType::HUSO_END_POINT:
-                m_husoEnd = {-1, -1};
                 break;
         }
 
         switch(tileType) {
-            case TileType::MAHEX_START_POINT:
+            case TileType::MAHEX_START:
                 for(int i = 0; i < m_grid.size(); ++i) {
                     for(int j = 0; j < m_grid[i].size(); ++j) {
-                        if(m_grid[i][j] == TileType::MAHEX_START_POINT) {
-                            m_grid[i][j] = TileType::NONE;
+                        if(m_grid[i][j].m_type == TileType::MAHEX_START) {
+                            m_grid[i][j].m_type = TileType::NONE;
                         }
                     }
                 }
                 m_mahexStart = {x * 48 + 8, y * 48 + 16};
                 break;
-            case TileType::MAHEX_END_POINT:
+            case TileType::MAHEX_END:
+                for(int i = 0; i < m_grid.size(); ++i) {
+                    for(int j = 0; j < m_grid[i].size(); ++j) {
+                        if(m_grid[i][j].m_type == TileType::MAHEX_END) {
+                            m_grid[i][j].m_type = TileType::NONE;
+                        }
+                    }
+                }
                 m_mahexEnd = {x * 48 + 8, y * 48 + 16};
+                break;
+            case TileType::HUSO_START:
                 for(int i = 0; i < m_grid.size(); ++i) {
                     for(int j = 0; j < m_grid[i].size(); ++j) {
-                        if(m_grid[i][j] == TileType::MAHEX_END_POINT) {
-                            m_grid[i][j] = TileType::NONE;
+                        if(m_grid[i][j].m_type == TileType::HUSO_START) {
+                            m_grid[i][j].m_type = TileType::NONE;
                         }
                     }
                 }
-                break;
-            case TileType::HUSO_START_POINT:
                 m_husoStart = {x * 48 + 8, y * 48 + 16};
-                for(int i = 0; i < m_grid.size(); ++i) {
-                    for(int j = 0; j < m_grid[i].size(); ++j) {
-                        if(m_grid[i][j] == TileType::HUSO_START_POINT) {
-                            m_grid[i][j] = TileType::NONE;
-                        }
-                    }
-                }
                 break;
-            case TileType::HUSO_END_POINT:
-                m_husoEnd = {x * 48 + 8, y * 48 + 16};
+            case TileType::HUSO_END:
                 for(int i = 0; i < m_grid.size(); ++i) {
                     for(int j = 0; j < m_grid[i].size(); ++j) {
-                        if(m_grid[i][j] == TileType::HUSO_END_POINT) {
-                            m_grid[i][j] = TileType::NONE;
+                        if(m_grid[i][j].m_type == TileType::HUSO_END) {
+                            m_grid[i][j].m_type = TileType::NONE;
                         }
                     }
                 }
+                m_husoEnd = {x * 48 + 8, y * 48 + 16};
+                break;
+            case TileType::KEYDOWN_BLOCK:
+            case TileType::PRESSURE_BLOCK:
+                for(int i = 0; i < m_grid.size(); ++i) {
+                    for(int j = 0; j < m_grid[i].size(); ++j) {
+                        if(m_grid[i][j].m_type == tileType && m_grid[i][j].m_id == m_currentID) {
+                            m_grid[i][j].m_type = TileType::NONE;
+                        }
+                    }
+                }
+                m_grid[x][y].m_id = m_currentID;
+                break;
+            case TileType::KEYDOWN_PLATE:
+                for(int i = 0; i < m_grid.size(); ++i) {
+                    for(int j = 0; j < m_grid[i].size(); ++j) {
+                        if(m_grid[i][j].m_type == tileType && m_grid[i][j].m_id == m_currentID) {
+                            m_grid[i][j].m_type = TileType::NONE;
+                        }
+                    }
+                }
+                m_grid[x][y].m_orientation = m_selectedOrientation;
+                m_grid[x][y].m_id = m_currentID;
+                break;
+            case TileType::PRESSURE_PLATE_START:
+                for(int i = 0; i < m_grid.size(); ++i) {
+                    for(int j = 0; j < m_grid[i].size(); ++j) {
+                        if(m_grid[i][j].m_type == tileType && m_grid[i][j].m_id == m_currentID) {
+                            m_grid[i][j].m_type = TileType::NONE;
+                        }
+                    }
+                }
+                m_grid[x][y].m_orientation = m_selectedOrientation;
+                m_grid[x][y].m_id = m_currentID;
+                m_pressurePlateStartX = x;
+                m_pressurePlateStartY = y;
+                break;
+
+            case TileType::PRESSURE_PLATE_END:
+                for(int i = 0; i < m_grid.size(); ++i) {
+                    for(int j = 0; j < m_grid[i].size(); ++j) {
+                        if(m_grid[i][j].m_type == tileType && m_grid[i][j].m_id == m_currentID) {
+                            m_grid[i][j].m_type = TileType::NONE;
+                        }
+                    }
+                }
+                m_grid[x][y].m_id = m_currentID;
+                m_grid[x][y].m_orientation = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation;
+                if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation == Orientation::HORIZONTAL)
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
+                else
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
                 break;
         }
 
-        m_grid[x][y] = tileType;
+        m_grid[x][y].m_type = tileType;
     }
 }
 
-TileType LevelEditor::GetTile(int x, int y) const {
+Tile LevelEditor::GetTile(int x, int y) const {
     if(x >= 0 && x < m_gridWidth && y >= 0 && y < m_gridHeight) {
         return m_grid[x][y];
     }
-    return TileType::NONE;
+
+    return Tile(0, 0, 0, 0, TileType::NONE, NULL, NULL);
 }
 
-std::string LevelEditor::TileTypeToString(const TileType &tile) {
-    switch(tile) {
+std::string LevelEditor::TileTypeToString(const TileType &tileType) {
+    switch(tileType) {
         case TileType::TILE:
             return "TILE";
-        case TileType::MAHEX_START_POINT:
-            return "MAHEX_START_POINT";
-        case TileType::MAHEX_END_POINT:
-            return "MAHEX_END_POINT";
-        case TileType::HUSO_START_POINT:
-            return "HUSO_START_POINT";
-        case TileType::HUSO_END_POINT:
-            return "HUSO_END_POINT";
-        default:
-            return "";
+        case TileType::SPIKES:
+            return "SPIKES";
+        case TileType::COIN:
+            return "COIN";
+        case TileType::KEYDOWN_BLOCK:
+            return "KEYDOWN_BLOCK";
+        case TileType::KEYDOWN_PLATE:
+            return "KEYDOWN_PLATE";
+        case TileType::PRESSURE_BLOCK:
+            return "PRESSURE_BLOCK";
+        case TileType::PRESSURE_PLATE_START:
+            return "PRESSURE_PLATE_START";
+        case TileType::PRESSURE_PLATE_END:
+            return "PRESSURE_PLATE_END";
+        case TileType::MAHEX_START:
+            return "MAHEX_START";
+        case TileType::MAHEX_END:
+            return "MAHEX_END";
+        case TileType::HUSO_START:
+            return "HUSO_START";
+        case TileType::HUSO_END:
+            return "HUSO_END";
     }
+
+    return "NONE";
 }
 
-TileType LevelEditor::StringToTileType(const std::string &str) {
+TileType LevelEditor::StringToTileType(const std::string &str) {     
     if(str == "TILE") return TileType::TILE;
-    else if(str == "MAHEX_START_POINT") return TileType::MAHEX_START_POINT;
-    else if(str == "MAHEX_END_POINT") return TileType::MAHEX_END_POINT;
-    else if(str == "HUSO_START_POINT") return TileType::HUSO_START_POINT;
-    else if(str == "HUSO_END_POINT") return TileType::HUSO_END_POINT;
+    else if(str == "SPIKES") return TileType::SPIKES;
+    else if(str == "COIN") return TileType::COIN;
+    else if(str == "KEYDOWN_BLOCK") return TileType::KEYDOWN_BLOCK;
+    else if(str == "KEYDOWN_PLATE") return TileType::KEYDOWN_PLATE;
+    else if(str == "PRESSURE_BLOCK") return TileType::PRESSURE_BLOCK;
+    else if(str == "PRESSURE_PLATE_START") return TileType::PRESSURE_PLATE_START;
+    else if(str == "PRESSURE_PLATE_END") return TileType::PRESSURE_PLATE_END;
+    else if(str == "MAHEX_START") return TileType::MAHEX_START;
+    else if(str == "MAHEX_END") return TileType::MAHEX_END;
+    else if(str == "HUSO_START") return TileType::HUSO_START;
+    else if(str == "HUSO_END") return TileType::HUSO_END;
     else return TileType::NONE;
+}
+
+std::string LevelEditor::OrientationToString(const Orientation &orientation) {
+    switch(orientation) {
+        case Orientation::HORIZONTAL:
+            return "HORIZONTAL";
+        case Orientation::VERTICAL:
+            return "VERTICAL";
+    }
+
+    return "NONE";
+}
+
+Orientation LevelEditor::StringToOrientation(const std::string &str) {
+    if(str == "HORIZONTAL") return Orientation::HORIZONTAL;
+    else if(str == "VERTICAL") return Orientation::VERTICAL;
+    else return Orientation::NONE;
 }
 
 bool LevelEditor::SaveToFile(const std::string& filename) {
@@ -124,49 +614,40 @@ bool LevelEditor::SaveToFile(const std::string& filename) {
 
         for(int x = 0; x < m_gridWidth; x++) {
             for(int y = 0; y < m_gridHeight; y++) {
-                if(m_grid[x][y] != TileType::NONE) {
+                if(m_grid[x][y].m_type != TileType::NONE && m_grid[x][y].m_type != TileType::PRESSURE_PLATE_END) {
                     json tileData = {
                         {"x", x * 48},
                         {"y", y * 48},
+                        {"type", TileTypeToString(m_grid[x][y].m_type)},
                         {"bitmap", "assets/images/tile.bmp"},
                         {"mask", "assets/images/tile_mask.bmp"},
-                        {"safe", true},
-                        {"collideable", true},
-                        {"type", TileTypeToString(m_grid[x][y])}
                     };
+
+                    switch(m_grid[x][y].m_type) {
+                        case TileType::KEYDOWN_BLOCK:
+                        case TileType::PRESSURE_BLOCK:
+                            tileData.push_back({"id", m_grid[x][y].m_id});
+                            break;
+                        case TileType::KEYDOWN_PLATE:
+                            tileData.push_back({"id", m_grid[x][y].m_id});
+                            tileData.push_back({"orientation", OrientationToString(m_grid[x][y].m_orientation)});
+                            break;
+                        case TileType::PRESSURE_PLATE_START:
+                            tileData.push_back({"id", m_grid[x][y].m_id});
+                            tileData.push_back({"orientation", OrientationToString(m_grid[x][y].m_orientation)});
+                            tileData.push_back({"endPos", m_grid[x][y].m_endPos * 48});
+                            break;
+                    }
+
                     levelData["tiles"].push_back(tileData);
                 }
             }
         }
 
         if(m_mahexStart.x == -1 || m_mahexEnd.x == -1 || m_husoStart.x == -1 || m_husoEnd.x == -1) {
-            MessageBox(m_hwndMainWindow, L"Start and end positions must be defined!", L"Error", MB_OK);
+            MessageBox(m_hwnd, L"Start and end positions must be defined!", L"Error", MB_OK);
             return false;
         }
-
-        json startPoints = {
-            {"mahex", {
-                {"x", m_mahexStart.x},
-                {"y", m_mahexStart.y}
-            }},
-            {"huso", {
-                {"x", m_husoStart.x},
-                {"y", m_husoStart.y}
-            }}
-        };
-        json endPoints = {
-            {"mahex", {
-                {"x", m_mahexEnd.x},
-                {"y", m_mahexEnd.y}
-            }},
-            {"huso", {
-                {"x", m_husoEnd.x},
-                {"y", m_husoEnd.y}
-            }}
-        };
-
-        levelData["start_points"] = startPoints;
-        levelData["end_points"] = endPoints;
 
         std::ofstream file(filename);
         file << levelData.dump(4);
@@ -189,23 +670,56 @@ void LevelEditor::LoadFromFile(const std::string& filename) {
     file >> levelData;
 
     m_grid.clear();
-    m_grid.resize(m_gridWidth, std::vector<TileType>(m_gridHeight, TileType::NONE));
+    m_grid.resize(m_gridWidth, std::vector<Tile>(m_gridHeight));
 
     for(const auto& tileData : levelData["tiles"]) {
         int x = tileData["x"] / 48;
         int y = tileData["y"] / 48;
         TileType type = StringToTileType(tileData["type"]);
-        SetTile(x, y, type);
-    }
 
-    m_mahexStart.x = levelData["start_points"]["mahex"]["x"];
-    m_mahexStart.y = levelData["start_points"]["mahex"]["y"];
-    m_mahexEnd.x = levelData["end_points"]["mahex"]["x"];
-    m_mahexEnd.y = levelData["end_points"]["mahex"]["y"];
-    m_husoStart.x = levelData["start_points"]["huso"]["x"];
-    m_husoStart.y = levelData["start_points"]["huso"]["y"];
-    m_husoEnd.x = levelData["end_points"]["huso"]["x"];
-    m_husoEnd.y = levelData["end_points"]["huso"]["y"];
+        m_grid[x][y].m_posX = tileData["x"];
+        m_grid[x][y].m_posY = tileData["y"];
+        m_grid[x][y].m_type = type;
+
+        switch(type) {
+            case TileType::MAHEX_START:
+                m_mahexStart.x = tileData["x"];
+                m_mahexStart.y = tileData["y"];
+                break;
+            case TileType::HUSO_START:
+                m_husoStart.x = tileData["x"];
+                m_husoStart.y = tileData["y"];
+                break;
+            case TileType::KEYDOWN_BLOCK:
+            case TileType::PRESSURE_BLOCK:
+                m_grid[x][y].m_id = tileData["id"];
+                break;
+            case TileType::KEYDOWN_PLATE:
+                m_grid[x][y].m_id = tileData["id"];
+                m_grid[x][y].m_orientation = StringToOrientation(tileData["orientation"]);
+                break;
+            case TileType::PRESSURE_PLATE_START:
+                m_grid[x][y].m_id = tileData["id"];
+                m_grid[x][y].m_orientation = StringToOrientation(tileData["orientation"]);
+                m_grid[x][y].m_endPos = tileData["endPos"];
+                if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
+                    int endPosY = m_grid[x][y].m_endPos / 48;
+                    m_grid[x][endPosY].m_posX = x * 48;
+                    m_grid[x][endPosY].m_posY = endPosY * 48;
+                    m_grid[x][endPosY].m_type = TileType::PRESSURE_PLATE_END;
+                    m_grid[x][endPosY].m_id = m_grid[x][y].m_id;
+                    m_grid[x][endPosY].m_orientation = m_grid[x][y].m_orientation;
+                } else {
+                    int endPosX = m_grid[x][y].m_endPos / 48;
+                    m_grid[endPosX][y].m_posX = endPosX * 48;
+                    m_grid[endPosX][y].m_posY = y * 48;
+                    m_grid[endPosX][y].m_type = TileType::PRESSURE_PLATE_END;
+                    m_grid[endPosX][y].m_id = m_grid[x][y].m_id;
+                    m_grid[endPosX][y].m_orientation = m_grid[x][y].m_orientation;
+                }
+                break;
+        }
+    }
 }
 
 bool LevelEditor::ShowSaveFileDialog(std::string& outFilePath) {
@@ -214,7 +728,7 @@ bool LevelEditor::ShowSaveFileDialog(std::string& outFilePath) {
 
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = m_hwndMainWindow;
+    ofn.hwndOwner = m_hwnd;
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = sizeof(szFile);
     ofn.lpstrFilter = "JSON Files\0*.json\0All Files\0*.*\0";
@@ -238,7 +752,7 @@ bool LevelEditor::ShowOpenFileDialog(std::string& outFilePath) {
 
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = m_hwndMainWindow;
+    ofn.hwndOwner = m_hwnd;
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = sizeof(szFile);
     ofn.lpstrFilter = "JSON Files\0*.json\0All Files\0*.*\0";
@@ -258,71 +772,73 @@ bool LevelEditor::ShowOpenFileDialog(std::string& outFilePath) {
 void LevelEditor::CheckInput() {
     POINT mousePos;
     GetCursorPos(&mousePos);
-    ScreenToClient(m_hwndMainWindow, &mousePos);
+    ScreenToClient(m_hwnd, &mousePos);
 
-    m_buttonCancel.ResetHoverState();
-    m_buttonEdit.ResetHoverState();
-    m_buttonSave.ResetHoverState();
-
-    m_buttonCancel.hovered = m_buttonCancel.IsMouseOver(mousePos.x, mousePos.y);
-    m_buttonEdit.hovered = m_buttonEdit.IsMouseOver(mousePos.x, mousePos.y);
-    m_buttonSave.hovered = m_buttonSave.IsMouseOver(mousePos.x, mousePos.y);
+    CheckHoverStatus(mousePos);
 
     int gridX = mousePos.x / 48;
     int gridY = mousePos.y / 48;
 
     if(IsKeyPressed(VK_LBUTTON)) {
-        if(!m_mousePressed) {
-            SetTile(gridX, gridY, m_selectedTile);
-            if(m_buttonSave.IsMouseOver(mousePos.x, mousePos.y)) {
-                std::string filePath;
-                if(ShowSaveFileDialog(filePath)) {
-                    if(SaveToFile(filePath)) {
-                        MessageBox(NULL, L"Level saved successfully!", L"Success", MB_OK);
-                        shouldExitToMainMenu = true;
-                    }
-                }
-            } else if(m_buttonEdit.IsMouseOver(mousePos.x, mousePos.y)) {
-                std::string filePath;
-                if(ShowOpenFileDialog(filePath)) {
-                    LoadFromFile(filePath);
-                }
-            } else if(m_buttonCancel.IsMouseOver(mousePos.x, mousePos.y)) {
-                    shouldExitToMainMenu = true;
-            }
-        }
+        SetTile(gridX, gridY, m_selectedTile);
+        CheckMousePress(mousePos);
     } else if(IsKeyPressed(VK_RBUTTON)) {
-        if(!m_mousePressed) {
-            SetTile(gridX, gridY, TileType::NONE);
-        }
-    } else {
-        m_mousePressed = false;
+        SetTile(gridX, gridY, TileType::NONE);
     }
 
-    // Handle keyboard shortcuts
-    if(IsKeyPressed('0')) m_selectedTile = TileType::NONE;
-    if(IsKeyPressed('1')) m_selectedTile = TileType::TILE;
-    if(IsKeyPressed('2')) m_selectedTile = TileType::MAHEX_START_POINT;
-    if(IsKeyPressed('3')) m_selectedTile = TileType::MAHEX_END_POINT;
-    if(IsKeyPressed('4')) m_selectedTile = TileType::HUSO_START_POINT;
-    if(IsKeyPressed('5')) m_selectedTile = TileType::HUSO_END_POINT;
-    if(IsKeyPressed('S')) {
-        if(SaveToFile("customLevel.json")) {
-            MessageBox(NULL, L"Level saved!", L"Info", MB_OK);
+    if(IsKeyPressed(VK_ESCAPE)) {
+        if(!m_escapePressed) {
+            m_escapePressed = true;
+            if(m_mechanicalTileInProgress) {
+                RemoveNonFinishedMechanicalTile();
+            } else if(m_selectedTile != TileType::NONE) {
+                m_selectedTile = TileType::NONE;
+            } else if(MessageBox(m_hwnd, L"Do you want to exit level editor?", L"Exit?", MB_OKCANCEL) == IDOK) shouldExitToMainMenu = true;
         }
+    } else {
+        m_escapePressed = false;
+    }
+
+    if(IsKeyPressed(VK_SPACE)) {
+        if(!m_spacePressed) {
+            m_spacePressed = true;
+            if(m_selectedTile == TileType::KEYDOWN_BLOCK) {
+                m_selectedTile = TileType::KEYDOWN_PLATE;
+                m_mechanicalTileInProgress = true;
+            } else if(m_selectedTile == TileType::KEYDOWN_PLATE) {
+                m_selectedTile = TileType::KEYDOWN_BLOCK;
+                m_mechanicalTileInProgress = false;
+                ++m_currentID;
+            } else if(m_selectedTile == TileType::PRESSURE_BLOCK) {
+                m_selectedTile = TileType::PRESSURE_PLATE_START;
+                m_mechanicalTileInProgress = true;
+            } else if(m_selectedTile == TileType::PRESSURE_PLATE_START) {
+                m_selectedTile = TileType::PRESSURE_PLATE_END;
+            } else if(m_selectedTile == TileType::PRESSURE_PLATE_END) {
+                m_selectedTile = TileType::PRESSURE_BLOCK;
+                m_mechanicalTileInProgress = false;
+                ++m_currentID;
+            }
+        }
+    } else {
+        m_spacePressed = false;
     }
 }
 
 void LevelEditor::Render() {
-    HDC hdc = GetDC(m_hwndMainWindow);
+    HDC hdc = GetDC(m_hwnd);
     HDC hdcBuffer = CreateCompatibleDC(hdc);
+    HDC hdcMem = CreateCompatibleDC(hdc);
     RECT clientRect;
-    GetClientRect(m_hwndMainWindow, &clientRect);
+    GetClientRect(m_hwnd, &clientRect);
     HBITMAP hbmBuffer = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
     HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
 
     HBRUSH backgroundBrush = CreateSolidBrush(0xe6d8ad);
     HPEN pen = CreatePen(PS_SOLID, 1, 0x0);
+
+    HBRUSH mahexStartBrush = CreateSolidBrush(0xff);
+    HBRUSH husoStartBrush = CreateSolidBrush(0xff0000);
 
     SelectObject(hdcBuffer, pen);
     SelectObject(hdcBuffer, backgroundBrush);
@@ -334,69 +850,37 @@ void LevelEditor::Render() {
     }
 
     DeleteObject(backgroundBrush);
-    DeleteObject(SelectObject(hdcBuffer, GetStockObject(BLACK_PEN)));
+    DeleteObject(pen);
+    backgroundBrush = CreateSolidBrush(0xccb366);
+    pen = CreatePen(PS_SOLID, 2, 0xb3922d);
 
-    HBRUSH tileBrush = CreateSolidBrush(0xff00);
-    HBRUSH mahexStartBrush = CreateSolidBrush(0xffff00);
-    HBRUSH mahexEndBrush = CreateSolidBrush(0xff);
-    HBRUSH husoStartBrush = CreateSolidBrush(0xcbc0ff);
-    HBRUSH husoEndBrush = CreateSolidBrush(0xa5ff);
+    SelectObject(hdcBuffer, backgroundBrush);
+    Rectangle(hdcBuffer, 1200, 0, 1600, 720);
 
-    // Draw grid tiles
-    for(int x = 0; x < m_gridWidth; x++) {
-        for(int y = 0; y < m_gridHeight; y++) {
-            TileType tileType = m_grid[x][y];
-            if(tileType != TileType::NONE) {
-                RECT rect = {
-                    x * 48,
-                    y * 48,
-                    (x + 1) * 48,
-                    (y + 1) * 48
-                };
-
-                HBRUSH brush = nullptr;
-
-                switch(tileType) {
-                    case TileType::TILE:
-                        brush = tileBrush;
-                        break;
-                    case TileType::MAHEX_START_POINT:
-                        brush = mahexStartBrush;
-                        break;
-                    case TileType::MAHEX_END_POINT:
-                        brush = mahexEndBrush;
-                        break;
-                    case TileType::HUSO_START_POINT:
-                        brush = husoStartBrush;
-                        break;
-                    case TileType::HUSO_END_POINT:
-                        brush = husoEndBrush;
-                        break;
-                }
-
-                if(brush) {
-                    FillRect(hdcBuffer, &rect, brush);
-                }
-            }
-        }
+    if(m_selectedMenu == LevelEditorMenu::PLAYER) {
+        SelectObject(hdcBuffer, pen);
+        SelectObject(hdcBuffer, mahexStartBrush);
+        Rectangle(hdcBuffer, 1501, 121, 1549, 169);
+        SelectObject(hdcBuffer, husoStartBrush);
+        Rectangle(hdcBuffer, 1501, 261, 1549, 309);
     }
 
-    // Render buttons
-    m_buttonCancel.Render(hdcBuffer);
-    m_buttonEdit.Render(hdcBuffer);
-    m_buttonSave.Render(hdcBuffer);
+    DeleteObject(backgroundBrush);
+    DeleteObject(pen);
+
+    RenderButtons(hdcBuffer);
+    RenderTiling(hdc, hdcBuffer);
+    RenderTiles(hdc, hdcBuffer);
 
     BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, hdcBuffer, 0, 0, SRCCOPY);
 
-    DeleteObject(tileBrush);
     DeleteObject(mahexStartBrush);
-    DeleteObject(mahexEndBrush);
     DeleteObject(husoStartBrush);
-    DeleteObject(husoEndBrush);
     SelectObject(hdcBuffer, hbmOldBuffer);
     DeleteObject(hbmBuffer);
     DeleteDC(hdcBuffer);
-    ReleaseDC(m_hwndMainWindow, hdc);
+    DeleteDC(hdcMem);
+    ReleaseDC(m_hwnd, hdc);
 }
 
 void LevelEditor::Update() {

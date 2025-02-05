@@ -22,9 +22,6 @@
     <Filter Include="assets\sounds">
       <UniqueIdentifier>{c829d2d4-13bf-4ad3-9e7f-cfdc610b1f14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="levels">
-      <UniqueIdentifier>{12324ed1-c283-46d2-9d40-cae468500f2d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,9 +65,6 @@
     <ClInclude Include="headers\LevelEditor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resources.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\tile.bmp">
@@ -79,10 +73,5 @@
     <Image Include="assets\images\tile_mask.bmp">
       <Filter>assets\images</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resources.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -9,7 +9,6 @@
 #include "Display.hpp"
 #include "Button.hpp"
 #include "LevelEditor.hpp"
-#include "../resources.h"
 
 using json = nlohmann::json;
 

@@ -352,9 +352,6 @@ void Game::CheckInput() {
             } else if(m_state == GameState::PAUSE) {
                 m_state = GameState::IN_GAME;
                 m_animationInProgress = false;
-            } else if(m_state == GameState::CUSTOM_LEVELS) {
-                m_state = GameState::MAIN_MENU;
-                UpdateWindowSize(false);
             }
         }
     } else {
@@ -499,26 +496,26 @@ bool Game::LoadLevelFromJSON(std::string path) {
                 continue;
             }
 
-            Tile tile{
-                tileData["x"].get<int>(),
-                tileData["y"].get<int>(),
-                bitmap,
-                mask,
-                tileData["safe"].get<bool>(),
-                tileData["collideable"].get<bool>()
-            };
+            //Tile tile{
+            //    tileData["x"].get<int>(),
+            //    tileData["y"].get<int>(),
+            //    bitmap,
+            //    mask,
+            //    tileData["safe"].get<bool>(),
+            //    tileData["collideable"].get<bool>()
+            //};
 
-            m_currentLevel.m_tiles.push_back(tile);
+            //m_currentLevel.m_tiles.push_back(tile);
         }
 
-        m_currentLevel.m_startMahex.x = levelData["start_points"]["mahex"]["x"].get<int>();
-        m_currentLevel.m_startMahex.y = levelData["start_points"]["mahex"]["y"].get<int>();
-        m_currentLevel.m_endMahex.x = levelData["end_points"]["mahex"]["x"].get<int>();
-        m_currentLevel.m_endMahex.y = levelData["end_points"]["mahex"]["y"].get<int>();
-        m_currentLevel.m_startHuso.x = levelData["start_points"]["huso"]["x"].get<int>();
-        m_currentLevel.m_startHuso.y = levelData["start_points"]["huso"]["y"].get<int>();
-        m_currentLevel.m_endHuso.x = levelData["end_points"]["huso"]["x"].get<int>();
-        m_currentLevel.m_endHuso.y = levelData["end_points"]["huso"]["y"].get<int>();
+        //m_currentLevel.m_startMahex.x = levelData["start_points"]["mahex"]["x"].get<int>();
+        //m_currentLevel.m_startMahex.y = levelData["start_points"]["mahex"]["y"].get<int>();
+        //m_currentLevel.m_endMahex.x = levelData["end_points"]["mahex"]["x"].get<int>();
+        //m_currentLevel.m_endMahex.y = levelData["end_points"]["mahex"]["y"].get<int>();
+        //m_currentLevel.m_startHuso.x = levelData["start_points"]["huso"]["x"].get<int>();
+        //m_currentLevel.m_startHuso.y = levelData["start_points"]["huso"]["y"].get<int>();
+        //m_currentLevel.m_endHuso.x = levelData["end_points"]["huso"]["x"].get<int>();
+        //m_currentLevel.m_endHuso.y = levelData["end_points"]["huso"]["y"].get<int>();
 
         return true;
 
