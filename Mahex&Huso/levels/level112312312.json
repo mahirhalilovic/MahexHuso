@@ -5,14 +5,14 @@
             "y": 544
         },
         "mahex": {
-            "x": 1112,
-            "y": 640
+            "x": 872,
+            "y": 544
         }
     },
     "start_points": {
         "huso": {
-            "x": 872,
-            "y": 544
+            "x": 1112,
+            "y": 640
         },
         "mahex": {
             "x": 56,
@@ -25,6 +25,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 0
         },
@@ -33,6 +34,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 48
         },
@@ -41,6 +43,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 96
         },
@@ -49,6 +52,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 144
         },
@@ -57,6 +61,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 192
         },
@@ -65,6 +70,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 240
         },
@@ -73,6 +79,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 288
         },
@@ -81,6 +88,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 336
         },
@@ -89,6 +97,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 384
         },
@@ -97,6 +106,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 432
         },
@@ -105,6 +115,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 480
         },
@@ -113,6 +124,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 528
         },
@@ -121,6 +133,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 576
         },
@@ -129,6 +142,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 624
         },
@@ -137,6 +151,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 0,
             "y": 672
         },
@@ -145,6 +160,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 48,
             "y": 0
         },
@@ -153,6 +169,16 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "MAHEX_START_POINT",
+            "x": 48,
+            "y": 624
+        },
+        {
+            "bitmap": "assets/images/tile.bmp",
+            "collideable": true,
+            "mask": "assets/images/tile_mask.bmp",
+            "safe": true,
+            "type": "TILE",
             "x": 48,
             "y": 672
         },
@@ -161,6 +187,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 96,
             "y": 0
         },
@@ -169,6 +196,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 96,
             "y": 576
         },
@@ -177,6 +205,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 96,
             "y": 672
         },
@@ -185,6 +214,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 144,
             "y": 0
         },
@@ -193,6 +223,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 144,
             "y": 576
         },
@@ -201,6 +232,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 144,
             "y": 672
         },
@@ -209,6 +241,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 192,
             "y": 0
         },
@@ -217,6 +250,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 192,
             "y": 576
         },
@@ -225,6 +259,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 192,
             "y": 672
         },
@@ -233,6 +268,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 240,
             "y": 0
         },
@@ -241,6 +277,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 240,
             "y": 576
         },
@@ -249,6 +286,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 240,
             "y": 672
         },
@@ -257,6 +295,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 288,
             "y": 0
         },
@@ -265,6 +304,16 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "HUSO_END_POINT",
+            "x": 288,
+            "y": 528
+        },
+        {
+            "bitmap": "assets/images/tile.bmp",
+            "collideable": true,
+            "mask": "assets/images/tile_mask.bmp",
+            "safe": true,
+            "type": "TILE",
             "x": 288,
             "y": 576
         },
@@ -273,6 +322,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 288,
             "y": 672
         },
@@ -281,6 +331,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 336,
             "y": 0
         },
@@ -289,6 +340,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 336,
             "y": 576
         },
@@ -297,6 +349,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 336,
             "y": 672
         },
@@ -305,6 +358,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 384,
             "y": 0
         },
@@ -313,6 +367,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 384,
             "y": 576
         },
@@ -321,6 +376,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 384,
             "y": 672
         },
@@ -329,6 +385,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 432,
             "y": 0
         },
@@ -337,6 +394,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 432,
             "y": 576
         },
@@ -345,6 +403,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 432,
             "y": 672
         },
@@ -353,6 +412,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 480,
             "y": 0
         },
@@ -361,6 +421,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 480,
             "y": 576
         },
@@ -369,6 +430,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 480,
             "y": 672
         },
@@ -377,6 +439,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 528,
             "y": 0
         },
@@ -385,6 +448,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 528,
             "y": 576
         },
@@ -393,6 +457,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 528,
             "y": 672
         },
@@ -401,6 +466,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 576,
             "y": 0
         },
@@ -409,6 +475,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 576,
             "y": 672
         },
@@ -417,6 +484,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 624,
             "y": 0
         },
@@ -425,6 +493,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 624,
             "y": 576
         },
@@ -433,6 +502,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 624,
             "y": 672
         },
@@ -441,6 +511,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 672,
             "y": 0
         },
@@ -449,6 +520,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 672,
             "y": 576
         },
@@ -457,6 +529,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 672,
             "y": 672
         },
@@ -465,6 +538,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 720,
             "y": 0
         },
@@ -473,6 +547,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 720,
             "y": 576
         },
@@ -481,6 +556,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 720,
             "y": 672
         },
@@ -489,6 +565,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 768,
             "y": 0
         },
@@ -497,6 +574,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 768,
             "y": 576
         },
@@ -505,6 +583,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 768,
             "y": 672
         },
@@ -513,6 +592,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 816,
             "y": 0
         },
@@ -521,6 +601,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 816,
             "y": 576
         },
@@ -529,6 +610,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 816,
             "y": 672
         },
@@ -537,6 +619,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 864,
             "y": 0
         },
@@ -545,6 +628,16 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "MAHEX_END_POINT",
+            "x": 864,
+            "y": 528
+        },
+        {
+            "bitmap": "assets/images/tile.bmp",
+            "collideable": true,
+            "mask": "assets/images/tile_mask.bmp",
+            "safe": true,
+            "type": "TILE",
             "x": 864,
             "y": 576
         },
@@ -553,6 +646,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 864,
             "y": 672
         },
@@ -561,6 +655,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 912,
             "y": 0
         },
@@ -569,6 +664,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 912,
             "y": 576
         },
@@ -577,6 +673,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 912,
             "y": 672
         },
@@ -585,6 +682,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 960,
             "y": 0
         },
@@ -593,6 +691,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 960,
             "y": 576
         },
@@ -601,6 +700,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 960,
             "y": 672
         },
@@ -609,6 +709,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1008,
             "y": 0
         },
@@ -617,6 +718,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1008,
             "y": 576
         },
@@ -625,6 +727,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1008,
             "y": 672
         },
@@ -633,6 +736,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1056,
             "y": 0
         },
@@ -641,6 +745,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1056,
             "y": 576
         },
@@ -649,6 +754,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1056,
             "y": 672
         },
@@ -657,6 +763,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1104,
             "y": 0
         },
@@ -665,6 +772,16 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "HUSO_START_POINT",
+            "x": 1104,
+            "y": 624
+        },
+        {
+            "bitmap": "assets/images/tile.bmp",
+            "collideable": true,
+            "mask": "assets/images/tile_mask.bmp",
+            "safe": true,
+            "type": "TILE",
             "x": 1104,
             "y": 672
         },
@@ -673,6 +790,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 0
         },
@@ -681,6 +799,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 48
         },
@@ -689,6 +808,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 96
         },
@@ -697,6 +817,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 144
         },
@@ -705,6 +826,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 192
         },
@@ -713,6 +835,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 240
         },
@@ -721,6 +844,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 288
         },
@@ -729,6 +853,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 336
         },
@@ -737,6 +862,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 384
         },
@@ -745,6 +871,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 432
         },
@@ -753,6 +880,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 480
         },
@@ -761,6 +889,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 528
         },
@@ -769,6 +898,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 576
         },
@@ -777,6 +907,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 624
         },
@@ -785,6 +916,7 @@
             "collideable": true,
             "mask": "assets/images/tile_mask.bmp",
             "safe": true,
+            "type": "TILE",
             "x": 1152,
             "y": 672
         }

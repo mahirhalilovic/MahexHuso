@@ -25,8 +25,12 @@ class LevelEditor {
     void Render();
     void Update();
 
+    std::string TileTypeToString(const TileType&);
+    TileType StringToTileType(const std::string&);
+    std::string OrientationToString(const Orientation&);
+    Orientation StringToOrientation(const std::string&);
+
     bool shouldExitToMainMenu = false;
-    static LevelEditor* instance;
 
     private:
     HWND m_hwnd;
@@ -40,10 +44,10 @@ class LevelEditor {
 
     LevelEditorMenu m_selectedMenu;
 
-    HBITMAP m_tileBitmap, m_tileMask, m_spikesBitmap, m_spikesMask, m_coinBitmap, m_coinMask;
-    HBITMAP m_keydownBlockBitmap, m_keydownBlockMask, m_pressureBlockBitmap, m_pressureBlockMask;
-    HBITMAP m_plateHorizontalBitmap, m_plateHorizontalMask, m_plateVerticalBitmap, m_plateVerticalMask;
-    HBITMAP m_mahexEndBitmap, m_mahexEndMask, m_husoEndBitmap, m_husoEndMask;
+    //HBITMAP m_tileBitmap, m_tileMask, m_spikesBitmap, m_spikesMask, m_coinBitmap, m_coinMask;
+    //HBITMAP m_keydownBlockBitmap, m_keydownBlockMask, m_pressureBlockBitmap, m_pressureBlockMask;
+    //HBITMAP m_plateHorizontalBitmap, m_plateHorizontalMask, m_plateVerticalBitmap, m_plateVerticalMask;
+    //HBITMAP m_mahexEndBitmap, m_mahexEndMask, m_husoEndBitmap, m_husoEndMask;
 
     Button m_buttonMenuTile, m_buttonMenuMechanical, m_buttonMenuPlayer;
     Button m_buttonTile, m_buttonSpikes, m_buttonCoin;
@@ -54,6 +58,7 @@ class LevelEditor {
     int m_pressurePlateStartX, m_pressurePlateStartY;
     int m_currentID;
 
+    void CheckBitmaps();
     void ConstructButtons();
     void CheckHoverStatus(const POINT&);
     void RenderButtons(const HDC&);
@@ -61,11 +66,6 @@ class LevelEditor {
     void RenderTiling(const HDC&, const HDC&);
     void CheckMousePress(const POINT&);
     void RemoveNonFinishedMechanicalTile();
-
-    std::string TileTypeToString(const TileType&);
-    TileType StringToTileType(const std::string&);
-    std::string OrientationToString(const Orientation&);
-    Orientation StringToOrientation(const std::string&);
 
     void SetTile(int, int, TileType);
     Tile GetTile(int, int) const;

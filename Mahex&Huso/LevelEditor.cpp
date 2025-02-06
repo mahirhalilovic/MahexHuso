@@ -1,55 +1,6 @@
 #include "headers/LevelEditor.hpp"
 
 LevelEditor::LevelEditor(HWND hwnd) : m_hwnd{hwnd} {
-    m_tileBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/tile.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_tileMask = (HBITMAP) LoadImage(NULL, L"assets/images/tile_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_spikesBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/spikes.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_spikesMask = (HBITMAP) LoadImage(NULL, L"assets/images/spikes_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_coinBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/coin.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_coinMask = (HBITMAP) LoadImage(NULL, L"assets/images/coin_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-    m_keydownBlockBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/keydown.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_keydownBlockMask = (HBITMAP) LoadImage(NULL, L"assets/images/keydown_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_pressureBlockBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/pressure.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_pressureBlockMask = (HBITMAP) LoadImage(NULL, L"assets/images/pressure_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_plateHorizontalBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/horizontal_plate.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_plateHorizontalMask = (HBITMAP) LoadImage(NULL, L"assets/images/horizontal_plate_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_plateVerticalBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/vertical_plate.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_plateVerticalMask = (HBITMAP) LoadImage(NULL, L"assets/images/vertical_plate_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-    m_mahexEndBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/door_mahex.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_mahexEndMask = (HBITMAP) LoadImage(NULL, L"assets/images/door_mahex_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_husoEndBitmap = (HBITMAP) LoadImage(NULL, L"assets/images/door_huso.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_husoEndMask = (HBITMAP) LoadImage(NULL, L"assets/images/door_huso_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-    if(!m_tileBitmap || !m_tileMask) {
-        MessageBox(NULL, L"Failed to load tile images", L"Error", MB_OK);
-    }
-    if(!m_spikesBitmap || !m_spikesMask) {
-        MessageBox(NULL, L"Failed to load spikes images", L"Error", MB_OK);
-    }
-    if(!m_coinBitmap || !m_coinMask) {
-        MessageBox(NULL, L"Failed to load coin images", L"Error", MB_OK);
-    }
-    if(!m_keydownBlockBitmap || !m_keydownBlockMask) {
-        MessageBox(NULL, L"Failed to load keydown images", L"Error", MB_OK);
-    }
-    if(!m_pressureBlockBitmap || !m_pressureBlockMask) {
-        MessageBox(NULL, L"Failed to load pressure images", L"Error", MB_OK);
-    }
-    if(!m_plateHorizontalBitmap || !m_plateHorizontalMask) {
-        MessageBox(NULL, L"Failed to load plate images", L"Error", MB_OK);
-    }
-    if(!m_plateVerticalBitmap || !m_plateVerticalMask) {
-        MessageBox(NULL, L"Failed to load plate images", L"Error", MB_OK);
-    }
-    if(!m_mahexEndBitmap || !m_mahexEndMask) {
-        MessageBox(NULL, L"Failed to load mahex door images", L"Error", MB_OK);
-    }
-    if(!m_husoEndBitmap || !m_husoEndMask) {
-        MessageBox(NULL, L"Failed to load huso door images", L"Error", MB_OK);
-    }
-
     m_gridWidth = 25;
     m_gridHeight = 15;
     m_selectedTile = TileType::NONE;
@@ -61,6 +12,7 @@ LevelEditor::LevelEditor(HWND hwnd) : m_hwnd{hwnd} {
     m_husoStart = m_husoEnd = {-1, -1};
 
     m_selectedMenu = LevelEditorMenu::TILES;
+    
     ConstructButtons();
 }
 
@@ -139,39 +91,39 @@ void LevelEditor::RenderTiling(const HDC &hdc, const HDC &hdcBuffer) {
 
     switch(m_selectedMenu) {
         case LevelEditorMenu::TILES:
-            SelectObject(hdcMem, m_tileMask);
+            SelectObject(hdcMem, Tiles::m_tileMask);
             BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_tileBitmap);
+            SelectObject(hdcMem, Tiles::m_tileBitmap);
             BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCAND);
-            SelectObject(hdcMem, m_spikesBitmap);
+            SelectObject(hdcMem, Tiles::m_spikesBitmap);
             BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_spikesMask);
+            SelectObject(hdcMem, Tiles::m_spikesMask);
             BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCAND);
-            SelectObject(hdcMem, m_coinBitmap);
+            SelectObject(hdcMem, Tiles::m_coinBitmap);
             BitBlt(hdcBuffer, 1517, 277, 16, 16, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_coinMask);
+            SelectObject(hdcMem, Tiles::m_coinMask);
             BitBlt(hdcBuffer, 1517, 277, 16, 16, hdcMem, 0, 0, SRCAND);
             break;
 
         case LevelEditorMenu::MECHANICAL:
-            SelectObject(hdcMem, m_keydownBlockBitmap);
+            SelectObject(hdcMem, Tiles::m_keydownBlockBitmap);
             BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_keydownBlockMask);
+            SelectObject(hdcMem, Tiles::m_keydownBlockMask);
             BitBlt(hdcBuffer, 1501, 121, 48, 48, hdcMem, 0, 0, SRCAND);
-            SelectObject(hdcMem, m_pressureBlockBitmap);
+            SelectObject(hdcMem, Tiles::m_pressureBlockBitmap);
             BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_pressureBlockMask);
+            SelectObject(hdcMem, Tiles::m_pressureBlockMask);
             BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCAND);
             break;
 
         case LevelEditorMenu::PLAYER:
-            SelectObject(hdcMem, m_mahexEndBitmap);
+            SelectObject(hdcMem, Tiles::m_mahexEndBitmap);
             BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_mahexEndMask);
+            SelectObject(hdcMem, Tiles::m_mahexEndMask);
             BitBlt(hdcBuffer, 1501, 191, 48, 48, hdcMem, 0, 0, SRCAND);
-            SelectObject(hdcMem, m_husoEndBitmap);
+            SelectObject(hdcMem, Tiles::m_husoEndBitmap);
             BitBlt(hdcBuffer, 1501, 331, 48, 48, hdcMem, 0, 0, SRCPAINT);
-            SelectObject(hdcMem, m_husoEndMask);
+            SelectObject(hdcMem, Tiles::m_husoEndMask);
             BitBlt(hdcBuffer, 1501, 331, 48, 48, hdcMem, 0, 0, SRCAND);
             break;
     }
@@ -200,47 +152,47 @@ void LevelEditor::RenderTiles(const HDC &hdc, const HDC &hdcBuffer) {
 
                 switch(tileType) {
                     case TileType::TILE:
-                        SelectObject(hdcMem, m_tileBitmap);
+                        SelectObject(hdcMem, Tiles::m_tileBitmap);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_tileMask);
+                        SelectObject(hdcMem, Tiles::m_tileMask);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
                         break;
                     case TileType::SPIKES:
-                        SelectObject(hdcMem, m_spikesBitmap);
+                        SelectObject(hdcMem, Tiles::m_spikesBitmap);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_spikesMask);
+                        SelectObject(hdcMem, Tiles::m_spikesMask);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
                         break;
                     case TileType::COIN:
-                        SelectObject(hdcMem, m_coinBitmap);
+                        SelectObject(hdcMem, Tiles::m_coinBitmap);
                         BitBlt(hdcBuffer, rect.left + 16, rect.top + 16, 16, 16, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_coinMask);
+                        SelectObject(hdcMem, Tiles::m_coinMask);
                         BitBlt(hdcBuffer, rect.left + 16, rect.top + 16, 16, 16, hdcMem, 0, 0, SRCAND);
                         break;
                     case TileType::KEYDOWN_BLOCK:
-                        SelectObject(hdcMem, m_keydownBlockBitmap);
+                        SelectObject(hdcMem, Tiles::m_keydownBlockBitmap);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_keydownBlockMask);
+                        SelectObject(hdcMem, Tiles::m_keydownBlockMask);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
                         break;
                     case TileType::KEYDOWN_PLATE:
                     case TileType::PRESSURE_PLATE_START:
                         if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
-                            SelectObject(hdcMem, m_plateHorizontalBitmap);
+                            SelectObject(hdcMem, Tiles::m_plateHorizontalBitmap);
                             BitBlt(hdcBuffer, rect.left, rect.top + 16, 48, 16, hdcMem, 0, 0, SRCPAINT);
-                            SelectObject(hdcMem, m_plateHorizontalMask);
+                            SelectObject(hdcMem, Tiles::m_plateHorizontalMask);
                             BitBlt(hdcBuffer, rect.left, rect.top + 16, 48, 16, hdcMem, 0, 0, SRCAND);
                         } else {
-                            SelectObject(hdcMem, m_plateVerticalBitmap);
+                            SelectObject(hdcMem, Tiles::m_plateVerticalBitmap);
                             BitBlt(hdcBuffer, rect.left + 16, rect.top, 16, 48, hdcMem, 0, 0, SRCPAINT);
-                            SelectObject(hdcMem, m_plateVerticalMask);
+                            SelectObject(hdcMem, Tiles::m_plateVerticalMask);
                             BitBlt(hdcBuffer, rect.left + 16, rect.top, 16, 48, hdcMem, 0, 0, SRCAND);
                         }
                         break;
                     case TileType::PRESSURE_BLOCK:
-                        SelectObject(hdcMem, m_pressureBlockBitmap);
+                        SelectObject(hdcMem, Tiles::m_pressureBlockBitmap);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_pressureBlockMask);
+                        SelectObject(hdcMem, Tiles::m_pressureBlockMask);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
                         break;
                     case TileType::PRESSURE_PLATE_END:
@@ -258,18 +210,18 @@ void LevelEditor::RenderTiles(const HDC &hdc, const HDC &hdcBuffer) {
                         brush = mahexStartBrush;
                         break;
                     case TileType::MAHEX_END:
-                        SelectObject(hdcMem, m_mahexEndBitmap);
+                        SelectObject(hdcMem, Tiles::m_mahexEndBitmap);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_mahexEndMask);
+                        SelectObject(hdcMem, Tiles::m_mahexEndMask);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
                         break;
                     case TileType::HUSO_START:
                         brush = husoStartBrush;
                         break;
                     case TileType::HUSO_END:
-                        SelectObject(hdcMem, m_husoEndBitmap);
+                        SelectObject(hdcMem, Tiles::m_husoEndBitmap);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCPAINT);
-                        SelectObject(hdcMem, m_husoEndMask);
+                        SelectObject(hdcMem, Tiles::m_husoEndMask);
                         BitBlt(hdcBuffer, rect.left, rect.top, 48, 48, hdcMem, 0, 0, SRCAND);
                         break;
                 }
@@ -435,6 +387,20 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
             case TileType::HUSO_START:
                 m_husoStart = {-1, -1};
                 break;
+            case TileType::KEYDOWN_BLOCK:
+            case TileType::KEYDOWN_PLATE:
+            case TileType::PRESSURE_BLOCK:
+            case TileType::PRESSURE_PLATE_START:
+            case TileType::PRESSURE_PLATE_END:
+                if(tileType == currentTile && GetTile(x, y).m_id == m_currentID) break;
+
+                for(int i = 0; i < m_grid.size(); ++i) {
+                    for(int j = 0; j < m_grid[i].size(); ++j) {
+                        if(m_grid[i][j].m_id == GetTile(x, y).m_id)
+                            m_grid[i][j].m_type = TileType::NONE;
+                    }
+                }
+                break;
         }
 
         switch(tileType) {
@@ -525,9 +491,9 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                 m_grid[x][y].m_id = m_currentID;
                 m_grid[x][y].m_orientation = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation;
                 if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation == Orientation::HORIZONTAL)
-                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
-                else
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
+                else
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
                 break;
         }
 
@@ -619,8 +585,6 @@ bool LevelEditor::SaveToFile(const std::string& filename) {
                         {"x", x * 48},
                         {"y", y * 48},
                         {"type", TileTypeToString(m_grid[x][y].m_type)},
-                        {"bitmap", "assets/images/tile.bmp"},
-                        {"mask", "assets/images/tile_mask.bmp"},
                     };
 
                     switch(m_grid[x][y].m_type) {
@@ -635,6 +599,11 @@ bool LevelEditor::SaveToFile(const std::string& filename) {
                         case TileType::PRESSURE_PLATE_START:
                             tileData.push_back({"id", m_grid[x][y].m_id});
                             tileData.push_back({"orientation", OrientationToString(m_grid[x][y].m_orientation)});
+                            if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
+                                tileData.push_back({"startPos", y * 48});
+                            } else {
+                                tileData.push_back({"startPos", x * 48});
+                            }
                             tileData.push_back({"endPos", m_grid[x][y].m_endPos * 48});
                             break;
                     }
@@ -686,20 +655,31 @@ void LevelEditor::LoadFromFile(const std::string& filename) {
                 m_mahexStart.x = tileData["x"];
                 m_mahexStart.y = tileData["y"];
                 break;
+            case TileType::MAHEX_END:
+                m_mahexEnd.x = tileData["x"];
+                m_mahexEnd.y = tileData["y"];
+                break;
             case TileType::HUSO_START:
                 m_husoStart.x = tileData["x"];
                 m_husoStart.y = tileData["y"];
                 break;
+            case TileType::HUSO_END:
+                m_husoEnd.x = tileData["x"];
+                m_husoEnd.y = tileData["y"];
+                break;
             case TileType::KEYDOWN_BLOCK:
             case TileType::PRESSURE_BLOCK:
                 m_grid[x][y].m_id = tileData["id"];
+                if(m_currentID < m_grid[x][y].m_id) m_currentID = m_grid[x][y].m_id;
                 break;
             case TileType::KEYDOWN_PLATE:
                 m_grid[x][y].m_id = tileData["id"];
+                if(m_currentID < m_grid[x][y].m_id) m_currentID = m_grid[x][y].m_id;
                 m_grid[x][y].m_orientation = StringToOrientation(tileData["orientation"]);
                 break;
             case TileType::PRESSURE_PLATE_START:
                 m_grid[x][y].m_id = tileData["id"];
+                if(m_currentID < m_grid[x][y].m_id) m_currentID = m_grid[x][y].m_id;
                 m_grid[x][y].m_orientation = StringToOrientation(tileData["orientation"]);
                 m_grid[x][y].m_endPos = tileData["endPos"];
                 if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
@@ -720,6 +700,8 @@ void LevelEditor::LoadFromFile(const std::string& filename) {
                 break;
         }
     }
+
+    ++m_currentID;
 }
 
 bool LevelEditor::ShowSaveFileDialog(std::string& outFilePath) {

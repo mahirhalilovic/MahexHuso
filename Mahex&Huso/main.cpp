@@ -16,19 +16,19 @@
 // [+] Create testing level
 // [+] Prevent movement outside of borders
 // [+] Design basic game level to test out collisions and movement
-// [-] Add cooperative mechanics(other player)
-// [-] Implement end goals
-// [-] Add obstacles
+// [+] Add cooperative mechanics(other player)
+// [+] Implement end goals
+// [+] Add obstacles
 // [+] Level restarting
 // [-] Implement score mechanics
 // [+] Add main menu
 // [-] Add sound effects and music
-// [-] Implement custom level creator
-// [-] Implement custom level saving, making own files
+// [+] Implement custom level creator
+// [+] Implement custom level saving, making own files
 // [-] Implement achievements
 // [-] Unlocking new skins
 // [-] Skin selection in main menu
-// [-] Add everything to a class
+// [+] Add everything to a class
 // [-] Spatial partitioning, quadtrees, multithreading?
 // [-] Non-rectangular shapes, SAT, bounding boxes, penetration depth?
 

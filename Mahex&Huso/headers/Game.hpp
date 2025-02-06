@@ -2,6 +2,9 @@
 
 #include <windows.h>
 #include <fstream>
+#include <codecvt>
+#include <locale>
+#include <set>
 #include "json.hpp"
 
 #include "Player.hpp"
@@ -18,6 +21,9 @@ using json = nlohmann::json;
 
 #define TILE_SIZE 48
 #define PLAYER_SIZE 32
+#define COIN_SIZE 16
+#define PLATE_WIDTH 16
+#define PLATE_LENGTH 48
 
 #define FPS_MAX 60
 
@@ -44,8 +50,14 @@ class Game {
 
 		GameState m_state = GameState::MAIN_MENU;
 		HWND m_hwnd;
-		Level m_currentLevel, m_loadedLevel;
-		bool levelLoadSuccessful = false;
+		std::string m_currentWorkingDirectory;
+
+		std::vector<Level> m_levels;
+		Level m_loadedLevel;
+		int m_currentLevel = 1;
+		unsigned int m_coins, m_score;
+		std::set<int> m_activePressureBlocks;
+
 		LevelEditor m_levelEditor;
 		Display m_display;
 
@@ -81,13 +93,20 @@ class Game {
 		void RenderOptions();
 		void RenderInGame();
 		void RenderPause();
+		void RenderWin() {}
+		void RenderGameOver() {}
+		void RenderTiles(const HDC&, const HDC&);
 
 		void UpdatePlayer(Player&);
 		void CheckInput();
 		void ProcessMouseClick(POINT);
 
-		void LoadLevel();
-		bool LoadLevelFromJSON(std::string);
+		void CheckWinningCondition();
+
+		void LoadLevel(int);
+		bool LoadLevelFromJSON(std::string, int);
+
+		Tile LoadTile(const json&);
 
 		void UpdateWindowSize(bool isEditor);
 

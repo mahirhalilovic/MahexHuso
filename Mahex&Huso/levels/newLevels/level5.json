@@ -81,167 +81,194 @@
             "y": 0
         },
         {
-            "type": "COIN",
-            "x": 48,
-            "y": 288
-        },
-        {
             "type": "TILE",
             "x": 48,
-            "y": 336
-        },
-        {
-            "type": "TILE",
-            "x": 48,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 96,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 96,
-            "y": 336
-        },
-        {
-            "type": "TILE",
-            "x": 96,
-            "y": 576
-        },
-        {
-            "type": "TILE",
-            "x": 96,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 144,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 144,
-            "y": 336
-        },
-        {
-            "type": "COIN",
-            "x": 144,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 144,
-            "y": 576
-        },
-        {
-            "type": "TILE",
-            "x": 144,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 192,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 192,
-            "y": 576
-        },
-        {
-            "type": "TILE",
-            "x": 192,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 240,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 240,
             "y": 48
         },
         {
-            "type": "TILE",
-            "x": 240,
-            "y": 96
-        },
-        {
-            "type": "TILE",
-            "x": 240,
+            "id": 0,
+            "type": "KEYDOWN_BLOCK",
+            "x": 48,
             "y": 144
         },
         {
-            "type": "TILE",
-            "x": 240,
+            "type": "COIN",
+            "x": 48,
+            "y": 288
+        },
+        {
+            "id": 3,
+            "type": "PRESSURE_BLOCK",
+            "x": 48,
             "y": 384
         },
         {
             "type": "TILE",
-            "x": 240,
+            "x": 48,
+            "y": 528
+        },
+        {
+            "type": "SPIKES",
+            "x": 48,
             "y": 672
         },
         {
             "type": "TILE",
-            "x": 288,
+            "x": 96,
             "y": 0
         },
         {
-            "type": "MAHEX_END",
-            "x": 288,
+            "type": "TILE",
+            "x": 96,
+            "y": 48
+        },
+        {
+            "type": "COIN",
+            "x": 96,
             "y": 96
         },
         {
             "type": "TILE",
-            "x": 288,
+            "x": 96,
             "y": 144
         },
         {
             "type": "TILE",
-            "x": 288,
-            "y": 288
-        },
-        {
-            "type": "TILE",
-            "x": 288,
+            "x": 96,
             "y": 384
         },
         {
             "type": "TILE",
-            "x": 288,
+            "x": 96,
+            "y": 528
+        },
+        {
+            "type": "COIN",
+            "x": 96,
+            "y": 624
+        },
+        {
+            "type": "TILE",
+            "x": 96,
             "y": 672
         },
         {
             "type": "TILE",
-            "x": 336,
+            "x": 144,
             "y": 0
         },
         {
             "type": "TILE",
-            "x": 336,
+            "x": 144,
+            "y": 48
+        },
+        {
+            "id": 4,
+            "orientation": "VERTICAL",
+            "type": "KEYDOWN_PLATE",
+            "x": 144,
+            "y": 96
+        },
+        {
+            "type": "TILE",
+            "x": 144,
             "y": 144
         },
         {
             "type": "TILE",
-            "x": 336,
-            "y": 288
-        },
-        {
-            "type": "TILE",
-            "x": 336,
+            "x": 144,
             "y": 384
         },
         {
             "type": "TILE",
-            "x": 336,
+            "x": 144,
+            "y": 528
+        },
+        {
+            "type": "SPIKES",
+            "x": 144,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 192,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 192,
+            "y": 144
+        },
+        {
+            "type": "TILE",
+            "x": 192,
             "y": 528
         },
         {
             "type": "TILE",
+            "x": 192,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 240,
+            "y": 0
+        },
+        {
+            "endPos": 144,
+            "id": 3,
+            "orientation": "HORIZONTAL",
+            "startPos": 288,
+            "type": "PRESSURE_PLATE_START",
+            "x": 240,
+            "y": 288
+        },
+        {
+            "type": "TILE",
+            "x": 240,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 288,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 288,
+            "y": 432
+        },
+        {
+            "type": "TILE",
+            "x": 288,
+            "y": 480
+        },
+        {
+            "type": "TILE",
+            "x": 288,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 336,
+            "y": 0
+        },
+        {
+            "endPos": 144,
+            "id": 2,
+            "orientation": "HORIZONTAL",
+            "startPos": 144,
+            "type": "PRESSURE_PLATE_START",
+            "x": 336,
+            "y": 144
+        },
+        {
+            "type": "TILE",
+            "x": 336,
+            "y": 480
+        },
+        {
+            "type": "TILE",
             "x": 336,
             "y": 672
         },
@@ -252,38 +279,18 @@
         },
         {
             "type": "TILE",
-            "x": 384,
-            "y": 288
-        },
-        {
-            "type": "COIN",
             "x": 384,
             "y": 480
         },
         {
             "type": "TILE",
             "x": 384,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 384,
             "y": 672
         },
         {
             "type": "TILE",
             "x": 432,
             "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 432,
-            "y": 192
-        },
-        {
-            "type": "TILE",
-            "x": 432,
-            "y": 528
         },
         {
             "type": "TILE",
@@ -298,12 +305,7 @@
         {
             "type": "TILE",
             "x": 480,
-            "y": 192
-        },
-        {
-            "type": "TILE",
-            "x": 480,
-            "y": 432
+            "y": 576
         },
         {
             "type": "TILE",
@@ -316,374 +318,298 @@
             "y": 0
         },
         {
-            "type": "COIN",
+            "type": "TILE",
             "x": 528,
+            "y": 576
+        },
+        {
+            "type": "TILE",
+            "x": 528,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 576,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 576,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 624,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 624,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 672,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 672,
             "y": 144
         },
         {
             "type": "TILE",
-            "x": 528,
-            "y": 192
-        },
-        {
-            "type": "COIN",
-            "x": 528,
-            "y": 384
+            "x": 672,
+            "y": 480
         },
         {
             "type": "TILE",
-            "x": 528,
-            "y": 432
-        },
-        {
-            "type": "MAHEX_START",
-            "x": 528,
-            "y": 624
-        },
-        {
-            "type": "TILE",
-            "x": 528,
+            "x": 672,
             "y": 672
         },
         {
             "type": "TILE",
-            "x": 576,
+            "x": 720,
+            "y": 0
+        },
+        {
+            "id": 1,
+            "type": "PRESSURE_BLOCK",
+            "x": 720,
+            "y": 144
+        },
+        {
+            "type": "TILE",
+            "x": 720,
+            "y": 480
+        },
+        {
+            "type": "TILE",
+            "x": 720,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 768,
             "y": 0
         },
         {
             "type": "TILE",
-            "x": 576,
-            "y": 48
+            "x": 768,
+            "y": 144
         },
         {
             "type": "TILE",
-            "x": 576,
+            "x": 768,
+            "y": 480
+        },
+        {
+            "type": "TILE",
+            "x": 768,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 816,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 816,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 864,
+            "y": 0
+        },
+        {
+            "type": "COIN",
+            "x": 864,
+            "y": 288
+        },
+        {
+            "endPos": 144,
+            "id": 1,
+            "orientation": "HORIZONTAL",
+            "startPos": 432,
+            "type": "PRESSURE_PLATE_START",
+            "x": 864,
+            "y": 432
+        },
+        {
+            "type": "TILE",
+            "x": 864,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 912,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 912,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 960,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 960,
             "y": 96
         },
         {
             "type": "TILE",
-            "x": 576,
+            "x": 960,
             "y": 144
         },
         {
             "type": "TILE",
-            "x": 576,
+            "x": 960,
             "y": 192
         },
         {
             "type": "TILE",
-            "x": 576,
+            "x": 960,
+            "y": 240
+        },
+        {
+            "type": "MAHEX_START",
+            "x": 960,
+            "y": 624
+        },
+        {
+            "type": "TILE",
+            "x": 960,
+            "y": 672
+        },
+        {
+            "type": "TILE",
+            "x": 1008,
+            "y": 0
+        },
+        {
+            "type": "TILE",
+            "x": 1008,
+            "y": 96
+        },
+        {
+            "type": "MAHEX_END",
+            "x": 1008,
+            "y": 192
+        },
+        {
+            "type": "TILE",
+            "x": 1008,
             "y": 240
         },
         {
             "type": "TILE",
-            "x": 576,
-            "y": 288
-        },
-        {
-            "type": "TILE",
-            "x": 576,
-            "y": 336
-        },
-        {
-            "type": "TILE",
-            "x": 576,
+            "x": 1008,
             "y": 384
         },
         {
-            "type": "TILE",
-            "x": 576,
-            "y": 432
-        },
-        {
-            "type": "TILE",
-            "x": 576,
-            "y": 480
-        },
-        {
-            "type": "TILE",
-            "x": 576,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 576,
+            "type": "SPIKES",
+            "x": 1008,
             "y": 576
         },
         {
-            "type": "TILE",
-            "x": 576,
-            "y": 624
-        },
-        {
-            "type": "TILE",
-            "x": 576,
+            "type": "SPIKES",
+            "x": 1008,
             "y": 672
         },
         {
             "type": "TILE",
-            "x": 624,
+            "x": 1056,
             "y": 0
         },
         {
-            "type": "COIN",
-            "x": 624,
-            "y": 144
-        },
-        {
-            "type": "TILE",
-            "x": 624,
-            "y": 192
-        },
-        {
-            "type": "COIN",
-            "x": 624,
-            "y": 384
-        },
-        {
-            "type": "TILE",
-            "x": 624,
-            "y": 432
-        },
-        {
-            "type": "HUSO_START",
-            "x": 624,
-            "y": 624
-        },
-        {
-            "type": "TILE",
-            "x": 624,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 672,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 672,
-            "y": 192
-        },
-        {
-            "type": "TILE",
-            "x": 672,
-            "y": 432
-        },
-        {
-            "type": "TILE",
-            "x": 672,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 720,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 720,
-            "y": 192
-        },
-        {
-            "type": "TILE",
-            "x": 720,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 720,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 768,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 768,
-            "y": 288
-        },
-        {
-            "type": "COIN",
-            "x": 768,
-            "y": 480
-        },
-        {
-            "type": "TILE",
-            "x": 768,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 768,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 816,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 816,
-            "y": 144
-        },
-        {
-            "type": "TILE",
-            "x": 816,
-            "y": 288
-        },
-        {
-            "type": "TILE",
-            "x": 816,
-            "y": 384
-        },
-        {
-            "type": "TILE",
-            "x": 816,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 816,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 864,
-            "y": 0
-        },
-        {
-            "type": "HUSO_END",
-            "x": 864,
+            "id": 0,
+            "orientation": "HORIZONTAL",
+            "type": "KEYDOWN_PLATE",
+            "x": 1056,
             "y": 96
         },
         {
             "type": "TILE",
-            "x": 864,
-            "y": 144
+            "x": 1056,
+            "y": 240
         },
         {
-            "type": "TILE",
-            "x": 864,
-            "y": 288
+            "type": "COIN",
+            "x": 1056,
+            "y": 336
         },
         {
-            "type": "TILE",
-            "x": 864,
+            "id": 2,
+            "type": "PRESSURE_BLOCK",
+            "x": 1056,
             "y": 384
         },
         {
+            "type": "COIN",
+            "x": 1056,
+            "y": 480
+        },
+        {
+            "id": 4,
+            "type": "KEYDOWN_BLOCK",
+            "x": 1056,
+            "y": 576
+        },
+        {
+            "type": "HUSO_START",
+            "x": 1056,
+            "y": 624
+        },
+        {
             "type": "TILE",
-            "x": 864,
+            "x": 1056,
             "y": 672
         },
         {
             "type": "TILE",
-            "x": 912,
+            "x": 1104,
             "y": 0
         },
         {
-            "type": "TILE",
-            "x": 912,
+            "type": "COIN",
+            "x": 1104,
             "y": 48
         },
         {
             "type": "TILE",
-            "x": 912,
+            "x": 1104,
             "y": 96
         },
         {
-            "type": "TILE",
-            "x": 912,
-            "y": 144
+            "type": "HUSO_END",
+            "x": 1104,
+            "y": 192
         },
         {
             "type": "TILE",
-            "x": 912,
+            "x": 1104,
+            "y": 240
+        },
+        {
+            "type": "TILE",
+            "x": 1104,
             "y": 384
         },
         {
-            "type": "TILE",
-            "x": 912,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 960,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 960,
-            "y": 576
-        },
-        {
-            "type": "TILE",
-            "x": 960,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 1008,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 1008,
-            "y": 336
-        },
-        {
-            "type": "COIN",
-            "x": 1008,
-            "y": 528
-        },
-        {
-            "type": "TILE",
-            "x": 1008,
-            "y": 576
-        },
-        {
-            "type": "TILE",
-            "x": 1008,
-            "y": 672
-        },
-        {
-            "type": "TILE",
-            "x": 1056,
-            "y": 0
-        },
-        {
-            "type": "TILE",
-            "x": 1056,
-            "y": 336
-        },
-        {
-            "type": "TILE",
-            "x": 1056,
-            "y": 576
-        },
-        {
-            "type": "TILE",
-            "x": 1056,
-            "y": 672
-        },
-        {
-            "type": "TILE",
+            "type": "SPIKES",
             "x": 1104,
-            "y": 0
+            "y": 576
         },
         {
             "type": "COIN",
             "x": 1104,
-            "y": 288
-        },
-        {
-            "type": "TILE",
-            "x": 1104,
-            "y": 336
+            "y": 624
         },
         {
             "type": "TILE",

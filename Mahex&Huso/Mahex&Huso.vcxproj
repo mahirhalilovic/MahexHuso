@@ -131,6 +131,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="LevelEditor.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Tiles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.hpp" />

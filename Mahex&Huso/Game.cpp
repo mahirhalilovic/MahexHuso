@@ -37,12 +37,82 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    0.f, 0.f, true, 0, IDLE};
+
+    wchar_t buffer[MAX_PATH];
+    DWORD result = GetCurrentDirectory(MAX_PATH, buffer);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    m_currentWorkingDirectory = converter.to_bytes(buffer);
+
+    m_levels.resize(5);
+
+    m_coins = m_score = 0;
+    m_currentLevel = 1;
 }
 
 void Game::Update() {
     CheckInput();
-    if(m_state == GameState::IN_GAME) UpdatePlayer(Mahex);
-    else if(m_state == GameState::CUSTOM_LEVELS) {
+    if(m_state == GameState::IN_GAME) {
+        CheckWinningCondition();
+        m_activePressureBlocks.clear();
+
+        UpdatePlayer(Mahex);
+        UpdatePlayer(Huso);
+
+        for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+            if(tile.m_type == TileType::PRESSURE_BLOCK) {
+                tile.m_active = (m_activePressureBlocks.find(tile.m_id) != m_activePressureBlocks.end());
+            }
+        }
+
+        std::unordered_map<int, Tile*> plateMap;
+        for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
+            if(plate.m_type == TileType::PRESSURE_PLATE_START) {
+                plateMap[plate.m_id] = &plate;
+            }
+        }
+
+        for(Tile &tile : m_levels[m_currentLevel - 1].m_tiles) {
+            if(tile.m_type == TileType::PRESSURE_BLOCK) {
+                if(tile.m_active) {
+                    auto it = plateMap.find(tile.m_id);
+                    if(it != plateMap.end()) {
+                        Tile *plate = it->second;
+                        if(plate->m_orientation == Orientation::HORIZONTAL) {
+                            if(plate->m_startPos < plate->m_endPos) {
+                                if(plate->m_posY < plate->m_endPos) plate->m_posY += 1;
+                            } else {
+                                if(plate->m_posY > plate->m_endPos) plate->m_posY -= 1;
+                            }
+                        } else {
+                            if(plate->m_startPos < plate->m_endPos) {
+                                if(plate->m_posX < plate->m_endPos) plate->m_posX += 1;
+                            } else {
+                                if(plate->m_posX > plate->m_endPos) plate->m_posX -= 1;
+                            }
+                        }
+                    }
+                } else {
+                    auto it = plateMap.find(tile.m_id);
+                    if(it != plateMap.end()) {
+                        Tile *plate = it->second;
+                        if(plate->m_orientation == Orientation::HORIZONTAL) {
+                            if(plate->m_startPos < plate->m_endPos) {
+                                if(plate->m_posY > plate->m_startPos) plate->m_posY -= 1;
+                            } else {
+                                if(plate->m_posY < plate->m_startPos) plate->m_posY += 1;
+                            }
+                        } else {
+                            if(plate->m_startPos < plate->m_endPos) {
+                                if(plate->m_posX > plate->m_startPos) plate->m_posX += 1;
+                            } else {
+                                if(plate->m_posX < plate->m_startPos) plate->m_posX -= 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else if(m_state == GameState::CUSTOM_LEVELS) {
         m_levelEditor.Update();
         if(m_levelEditor.shouldExitToMainMenu) {
             UpdateWindowSize(false);
@@ -64,19 +134,46 @@ void Game::UpdatePlayer(Player &player) {
     GetClientRect(m_hwnd, &clientRect);
 
     RECT currentRect = {player.m_posX, player.m_posY, player.m_posX + PLAYER_SIZE, player.m_posY + PLAYER_SIZE};
+    RECT groundCheck = {currentRect.left, currentRect.bottom, currentRect.right, currentRect.bottom + 1};
     RECT nextRect = {newPosX, newPosY, newPosX + PLAYER_SIZE, newPosY + PLAYER_SIZE};
 
     player.m_grounded = false;
 
-    for(const Tile& tile : m_currentLevel.m_tiles) {
+    for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
         RECT intersection;
-        RECT groundCheck = {currentRect.left, currentRect.bottom, currentRect.right, currentRect.bottom + 1};
         RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + TILE_SIZE, tile.m_posY + TILE_SIZE};
+
+        if(tile.m_type == TileType::KEYDOWN_PLATE && tile.m_active) continue;
+
         if(IntersectRect(&intersection, &groundCheck, &tileCheck)) {
+            switch(tile.m_type) {
+                case TileType::SPIKES:
+                    // Signal game over
+                    LoadLevel(m_currentLevel);
+                    return;
+                case TileType::KEYDOWN_PLATE:
+                case TileType::PRESSURE_PLATE_START:
+                    player.m_posY = tile.m_posY + 16;
+                    player.m_grounded = true;
+                    continue;
+                case TileType::PRESSURE_BLOCK:
+                    m_activePressureBlocks.insert(tile.m_id);
+                    break;
+            }
+
             player.m_grounded = true;
         }
 
         if(IntersectRect(&intersection, &nextRect, &tileCheck)) {
+            switch(tile.m_type) {
+                case TileType::MAHEX_END:
+                case TileType::HUSO_END:
+                    continue;
+                case TileType::COIN:
+                    ++m_coins;
+                    continue;
+            }
+
             if(player.m_velY > 0 && currentRect.bottom <= tileCheck.top) {
                 newPosY = tileCheck.top - PLAYER_SIZE;
                 player.m_velY = 0;
@@ -217,18 +314,18 @@ void Game::RenderInGame() {
     FillRect(hdcBuffer, &clientRect, brush);
 
     // Tiles
-    for(const Tile& tile : m_currentLevel.m_tiles) {
-        SelectObject(hdcMem, tile.m_mask);
-        BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
-        SelectObject(hdcMem, tile.m_bitmap);
-        BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
-    }
+    RenderTiles(hdc, hdcBuffer);
 
     // Player
     SelectObject(hdcMem, Mahex.m_mask);
     BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCPAINT);
     SelectObject(hdcMem, Mahex.m_bitmap);
     BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCAND);
+
+    SelectObject(hdcMem, Huso.m_mask);
+    BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCPAINT);
+    SelectObject(hdcMem, Huso.m_bitmap);
+    BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCAND);
 
     BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, hdcBuffer, 0, 0, SRCCOPY);
 
@@ -290,6 +387,94 @@ void Game::RenderPause() {
     ReleaseDC(m_hwnd, hdc);
 }
 
+void Game::RenderTiles(const HDC &hdc, const HDC &hdcBuffer) {
+    HDC hdcMem = CreateCompatibleDC(hdc);
+
+    for(const Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+        switch(tile.m_type) {
+            case TileType::TILE:
+                SelectObject(hdcMem, Tiles::m_tileBitmap);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                SelectObject(hdcMem, Tiles::m_tileMask);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                break;
+            case TileType::SPIKES:
+                SelectObject(hdcMem, Tiles::m_spikesBitmap);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                SelectObject(hdcMem, Tiles::m_spikesMask);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                break;
+            case TileType::COIN:
+                SelectObject(hdcMem, Tiles::m_coinBitmap);
+                BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY + 16, COIN_SIZE, COIN_SIZE, hdcMem, 0, 0, SRCPAINT);
+                SelectObject(hdcMem, Tiles::m_coinMask);
+                BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY + 16, COIN_SIZE, COIN_SIZE, hdcMem, 0, 0, SRCAND);
+                break;
+            case TileType::KEYDOWN_BLOCK:
+                SelectObject(hdcMem, Tiles::m_keydownBlockBitmap);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                SelectObject(hdcMem, Tiles::m_keydownBlockMask);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                break;
+            case TileType::KEYDOWN_PLATE:
+                if(tile.m_active) continue;
+
+                if(tile.m_orientation == Orientation::HORIZONTAL) {
+                    SelectObject(hdcMem, Tiles::m_plateHorizontalBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY + 16, PLATE_LENGTH, PLATE_WIDTH, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_plateHorizontalMask);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY + 16, PLATE_LENGTH, PLATE_WIDTH, hdcMem, 0, 0, SRCAND);
+                } else {
+                    SelectObject(hdcMem, Tiles::m_plateVerticalBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY, PLATE_WIDTH, PLATE_LENGTH, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_plateVerticalMask);
+                    BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY, PLATE_WIDTH, PLATE_LENGTH, hdcMem, 0, 0, SRCAND);
+                }
+                break;
+            case TileType::PRESSURE_BLOCK:
+                if(tile.m_active) {
+                    SelectObject(hdcMem, Tiles::m_pressureBlockActiveBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_pressureBlockActiveMask);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                } else {
+                    SelectObject(hdcMem, Tiles::m_pressureBlockBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_pressureBlockMask);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                }
+                break;
+            case TileType::PRESSURE_PLATE_START:
+                if(tile.m_orientation == Orientation::HORIZONTAL) {
+                    SelectObject(hdcMem, Tiles::m_plateHorizontalBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY + 16, PLATE_LENGTH, PLATE_WIDTH, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_plateHorizontalMask);
+                    BitBlt(hdcBuffer, tile.m_posX, tile.m_posY + 16, PLATE_LENGTH, PLATE_WIDTH, hdcMem, 0, 0, SRCAND);
+                } else {
+                    SelectObject(hdcMem, Tiles::m_plateVerticalBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY, PLATE_WIDTH, PLATE_LENGTH, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_plateVerticalMask);
+                    BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY, PLATE_WIDTH, PLATE_LENGTH, hdcMem, 0, 0, SRCAND);
+                }
+                break;
+            case TileType::MAHEX_END:
+                SelectObject(hdcMem, Tiles::m_mahexEndBitmap);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                SelectObject(hdcMem, Tiles::m_mahexEndMask);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                break;
+            case TileType::HUSO_END:
+                SelectObject(hdcMem, Tiles::m_husoEndBitmap);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCPAINT);
+                SelectObject(hdcMem, Tiles::m_husoEndMask);
+                BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
+                break;
+        }
+    }
+
+    DeleteDC(hdcMem);
+}
+
 void Game::CheckInput() {
     POINT mousePos;
     GetCursorPos(&mousePos);
@@ -342,6 +527,40 @@ void Game::CheckInput() {
     if(IsKeyPressed(VK_UP) && Mahex.m_grounded) {
         Mahex.m_velY = -JUMP_HEIGHT;
         Mahex.m_grounded = false;
+    }
+    if(IsKeyPressed(VK_DOWN)) {
+        int tileX = Mahex.m_posX / TILE_SIZE;
+        int tileY = (Mahex.m_posY + PLAYER_SIZE) / TILE_SIZE;
+
+        for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+            int currentTileX = tile.m_posX / TILE_SIZE;
+            int currentTileY = tile.m_posY / TILE_SIZE;
+
+            if(currentTileX == tileX && currentTileY == tileY) {
+                if(tile.m_type == TileType::KEYDOWN_BLOCK) {
+                    for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
+                        if(plate.m_id == tile.m_id)
+                            plate.m_active = true;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    if(IsKeyPressed('A')) {
+        Huso.m_direction = DIRECTION_LEFT;
+        Huso.m_velX = -MOVE_SPEED;
+    } else if(IsKeyPressed('D')) {
+        Huso.m_direction = DIRECTION_RIGHT;
+        Huso.m_velX = MOVE_SPEED;
+    } else {
+        Huso.m_direction = IDLE;
+        Huso.m_velX = 0;
+    }
+    if(IsKeyPressed('W') && Huso.m_grounded) {
+        Huso.m_velY = -JUMP_HEIGHT;
+        Huso.m_grounded = false;
     }
 
     if(IsKeyPressed(VK_ESCAPE)) {
@@ -397,7 +616,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 buttonPlayMenuBack.ResetHoverState();
                 //m_state = GameState::GAME_LEVELS;
                 m_state = GameState::IN_GAME;
-                LoadLevel();
+                LoadLevel(1);
             } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
                 buttonPlayMenuGameLevels.ResetHoverState();
                 buttonPlayMenuCustomLevels.ResetHoverState();
@@ -431,7 +650,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 buttonPauseMenuRestart.ResetHoverState();
                 buttonPauseMenuOptions.ResetHoverState();
                 buttonPauseMenuQuit.ResetHoverState();
-                LoadLevel();
+                LoadLevel(1);
                 m_state = GameState::IN_GAME;
             } else if(buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
                 buttonPauseMenuResume.ResetHoverState();
@@ -451,23 +670,55 @@ void Game::ProcessMouseClick(POINT mousePos) {
     }
 }
 
-void Game::LoadLevel() {
-    if(LoadLevelFromJSON("levels/level1.json")) {
-        Mahex.m_posX = m_currentLevel.m_startMahex.x;
-        Mahex.m_posY = m_currentLevel.m_startMahex.y;
-        Mahex.m_velX = 0;
-        Mahex.m_velY = 0;
-        Mahex.m_grounded = false;
+void Game::LoadLevel(int newLevel) {
+    std::string path = m_currentWorkingDirectory + "/levels/level";
+    path += std::to_string(newLevel);
+    path += ".json";
 
-        Huso.m_posX = m_currentLevel.m_startHuso.x;
-        Huso.m_posY = m_currentLevel.m_startHuso.y;
-        Huso.m_velX = 0;
-        Huso.m_velY = 0;
-        Huso.m_grounded = false;
+    //std::wstring wstr(path.begin(), path.end());
+
+    //MessageBox(m_hwnd, wstr.c_str(), L"Loading path", MB_OK);
+
+    LoadLevelFromJSON(path, newLevel - 1);
+
+    Mahex.m_posX = m_levels[m_currentLevel - 1].m_startMahex.x;
+    Mahex.m_posY = m_levels[m_currentLevel - 1].m_startMahex.y;
+    Mahex.m_velX = 0;
+    Mahex.m_velY = 0;
+    Mahex.m_grounded = false;
+
+    Huso.m_posX = m_levels[m_currentLevel - 1].m_startHuso.x;
+    Huso.m_posY = m_levels[m_currentLevel - 1].m_startHuso.y;
+    Huso.m_velX = 0;
+    Huso.m_velY = 0;
+    Huso.m_grounded = false;
+}
+
+void Game::CheckWinningCondition() {
+    bool mahexEnd = false, husoEnd = false;
+
+    RECT currentMahexRect = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_SIZE, Mahex.m_posY + PLAYER_SIZE};
+    RECT currentHusoRect = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_SIZE, Huso.m_posY + PLAYER_SIZE};
+
+    for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+        RECT intersection;
+        RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + TILE_SIZE, tile.m_posY + TILE_SIZE};
+        
+        if(tile.m_type == TileType::MAHEX_END) {
+            mahexEnd = IntersectRect(&intersection, &currentMahexRect, &tileCheck);
+        } else if(tile.m_type == TileType::HUSO_END) {
+            husoEnd = IntersectRect(&intersection, &currentHusoRect, &tileCheck);
+        } else {
+            continue;
+        }
+    }
+
+    if(mahexEnd && husoEnd) {
+        if(MessageBox(m_hwnd, L"GAME WON", L"WIN", MB_OK) == IDOK) m_state = GameState::MAIN_MENU;
     }
 }
 
-bool Game::LoadLevelFromJSON(std::string path) {
+bool Game::LoadLevelFromJSON(std::string path, int id) {
     try {
         std::ifstream file(path);
         if(!file.is_open()) {
@@ -479,43 +730,21 @@ bool Game::LoadLevelFromJSON(std::string path) {
         file >> levelData;
         file.close();
 
-        m_currentLevel.m_tiles.clear();
+        m_loadedLevel.m_tiles.clear();
 
         for(const auto& tileData : levelData["tiles"]) {
-            std::string bitmapPath = tileData["bitmap"].get<std::string>();
-            std::string maskPath = tileData["mask"].get<std::string>();
-
-            std::wstring wBitmapPath(bitmapPath.begin(), bitmapPath.end());
-            std::wstring wMaskPath(maskPath.begin(), maskPath.end());
-
-            HBITMAP bitmap = (HBITMAP) LoadImage(NULL, wBitmapPath.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-            HBITMAP mask = (HBITMAP) LoadImage(NULL, wMaskPath.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-            if(!bitmap || !mask) {
-                MessageBox(NULL, L"Failed to load tile images", L"Warning", MB_OK | MB_ICONWARNING);
-                continue;
+            if(m_levelEditor.StringToTileType(tileData["type"]) == TileType::MAHEX_START) {
+                m_loadedLevel.m_startMahex.x = tileData["x"];
+                m_loadedLevel.m_startMahex.y = tileData["y"];
+            } else if(m_levelEditor.StringToTileType(tileData["type"]) == TileType::HUSO_START) {
+                m_loadedLevel.m_startHuso.x = tileData["x"];
+                m_loadedLevel.m_startHuso.y = tileData["y"];
+            } else {
+                m_loadedLevel.m_tiles.push_back(LoadTile(tileData));
             }
-
-            //Tile tile{
-            //    tileData["x"].get<int>(),
-            //    tileData["y"].get<int>(),
-            //    bitmap,
-            //    mask,
-            //    tileData["safe"].get<bool>(),
-            //    tileData["collideable"].get<bool>()
-            //};
-
-            //m_currentLevel.m_tiles.push_back(tile);
         }
 
-        //m_currentLevel.m_startMahex.x = levelData["start_points"]["mahex"]["x"].get<int>();
-        //m_currentLevel.m_startMahex.y = levelData["start_points"]["mahex"]["y"].get<int>();
-        //m_currentLevel.m_endMahex.x = levelData["end_points"]["mahex"]["x"].get<int>();
-        //m_currentLevel.m_endMahex.y = levelData["end_points"]["mahex"]["y"].get<int>();
-        //m_currentLevel.m_startHuso.x = levelData["start_points"]["huso"]["x"].get<int>();
-        //m_currentLevel.m_startHuso.y = levelData["start_points"]["huso"]["y"].get<int>();
-        //m_currentLevel.m_endHuso.x = levelData["end_points"]["huso"]["x"].get<int>();
-        //m_currentLevel.m_endHuso.y = levelData["end_points"]["huso"]["y"].get<int>();
+        m_levels[id] = std::move(m_loadedLevel);
 
         return true;
 
@@ -523,6 +752,42 @@ bool Game::LoadLevelFromJSON(std::string path) {
         MessageBoxA(NULL, e.what(), "Error", MB_OK | MB_ICONERROR);
         return false;
     }
+}
+
+Tile Game::LoadTile(const json &tileData) {
+    Tile newTile;
+
+    newTile.m_posX = tileData["x"];
+    newTile.m_posY = tileData["y"];
+    newTile.m_type = m_levelEditor.StringToTileType(tileData["type"]);
+
+    switch(newTile.m_type) {
+        case TileType::TILE:
+        case TileType::SPIKES:
+        case TileType::COIN:
+        case TileType::HUSO_START:
+        case TileType::HUSO_END:
+            break;
+
+        case TileType::KEYDOWN_BLOCK:
+        case TileType::PRESSURE_BLOCK:
+            newTile.m_id = tileData["id"];
+            break;
+
+        case TileType::KEYDOWN_PLATE:
+            newTile.m_id = tileData["id"];
+            newTile.m_orientation = m_levelEditor.StringToOrientation(tileData["orientation"]);
+            break;
+
+        case TileType::PRESSURE_PLATE_START:
+            newTile.m_id = tileData["id"];
+            newTile.m_orientation = m_levelEditor.StringToOrientation(tileData["orientation"]);
+            newTile.m_startPos = tileData["startPos"];
+            newTile.m_endPos = tileData["endPos"];
+            break;
+    }
+
+    return newTile;
 }
 
 void Game::UpdateWindowSize(bool isEditor) {

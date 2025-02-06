@@ -26,29 +26,55 @@ enum class Orientation {
 
 struct Tile : Object {
     TileType m_type = TileType::NONE;
-    int m_width;
-    int m_height;
-    int m_id;
-    Orientation m_orientation;
-    int m_endPos;
-    int m_active;
-    int m_counter;
+    int m_id = -1;
+    Orientation m_orientation = Orientation::NONE;
+    int m_startPos = 0;
+    int m_endPos = 0;
+    bool m_active = false;
+    int m_counter = 0;
 
     Tile() = default;
 
     Tile(int posX, int posY, int width, int height, TileType type, HBITMAP bitmap, HBITMAP mask)
-        : m_width{width}, m_height{height}, m_type{type} {
+        : m_type{type} {
         m_posX = posX;
         m_posY = posY;
         m_bitmap = bitmap;
         m_mask = mask;
         m_id = 0;
+        m_startPos = 0;
         m_endPos = 0;
         m_active = false;
         m_counter = 0;
         m_orientation = Orientation::NONE;
     }
 };
+
+namespace Tiles {
+    extern HBITMAP m_tileBitmap;
+    extern HBITMAP m_tileMask;
+    extern HBITMAP m_spikesBitmap;
+    extern HBITMAP m_spikesMask;
+    extern HBITMAP m_coinBitmap;
+    extern HBITMAP m_coinMask;
+    extern HBITMAP m_keydownBlockBitmap;
+    extern HBITMAP m_keydownBlockMask;
+    extern HBITMAP m_pressureBlockBitmap;
+    extern HBITMAP m_pressureBlockMask;
+    extern HBITMAP m_pressureBlockActiveBitmap;
+    extern HBITMAP m_pressureBlockActiveMask;
+    extern HBITMAP m_plateHorizontalBitmap;
+    extern HBITMAP m_plateHorizontalMask;
+    extern HBITMAP m_plateVerticalBitmap;
+    extern HBITMAP m_plateVerticalMask;
+    extern HBITMAP m_mahexEndBitmap;
+    extern HBITMAP m_mahexEndMask;
+    extern HBITMAP m_husoEndBitmap;
+    extern HBITMAP m_husoEndMask;
+    
+    struct BitmapLoader;
+    extern BitmapLoader loader;
+}
 
 //class MechanicalTile : Tile {
 //    public:
