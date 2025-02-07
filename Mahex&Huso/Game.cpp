@@ -46,7 +46,7 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     m_levels.resize(5);
 
     m_coins = m_score = 0;
-    m_currentLevel = 1;
+    m_currentLevel = 4;
 }
 
 void Game::Update() {
@@ -81,7 +81,19 @@ void Game::Update() {
                             if(plate->m_startPos < plate->m_endPos) {
                                 if(plate->m_posY < plate->m_endPos) plate->m_posY += 1;
                             } else {
-                                if(plate->m_posY > plate->m_endPos) plate->m_posY -= 1;
+                                if(plate->m_posY > plate->m_endPos) {
+                                    plate->m_posY -= 1;
+
+                                    RECT intersect;
+                                    RECT mahexCheck = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_SIZE, Mahex.m_posY + PLAYER_SIZE + 1};
+                                    RECT husoCheck = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_SIZE, Huso.m_posY + PLAYER_SIZE + 1};
+                                    RECT tileCheck = {plate->m_posX, plate->m_posY, plate->m_posX + TILE_SIZE, plate->m_posY + TILE_SIZE};
+                                    if(IntersectRect(&intersect, &mahexCheck, &tileCheck)) {
+                                        Mahex.m_posY -= 1;
+                                    } else if(IntersectRect(&intersect, &husoCheck, &tileCheck)) {
+                                        Huso.m_posY -= 1;
+                                    }
+                                }
                             }
                         } else {
                             if(plate->m_startPos < plate->m_endPos) {
@@ -170,6 +182,8 @@ void Game::UpdatePlayer(Player &player) {
                 case TileType::HUSO_END:
                     continue;
                 case TileType::COIN:
+                    if(tile.m_active) continue;
+                    tile.m_active = true;
                     ++m_coins;
                     continue;
             }
@@ -405,10 +419,12 @@ void Game::RenderTiles(const HDC &hdc, const HDC &hdcBuffer) {
                 BitBlt(hdcBuffer, tile.m_posX, tile.m_posY, TILE_SIZE, TILE_SIZE, hdcMem, 0, 0, SRCAND);
                 break;
             case TileType::COIN:
-                SelectObject(hdcMem, Tiles::m_coinBitmap);
-                BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY + 16, COIN_SIZE, COIN_SIZE, hdcMem, 0, 0, SRCPAINT);
-                SelectObject(hdcMem, Tiles::m_coinMask);
-                BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY + 16, COIN_SIZE, COIN_SIZE, hdcMem, 0, 0, SRCAND);
+                if(!tile.m_active) {
+                    SelectObject(hdcMem, Tiles::m_coinBitmap);
+                    BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY + 16, COIN_SIZE, COIN_SIZE, hdcMem, 0, 0, SRCPAINT);
+                    SelectObject(hdcMem, Tiles::m_coinMask);
+                    BitBlt(hdcBuffer, tile.m_posX + 16, tile.m_posY + 16, COIN_SIZE, COIN_SIZE, hdcMem, 0, 0, SRCAND);
+                }
                 break;
             case TileType::KEYDOWN_BLOCK:
                 SelectObject(hdcMem, Tiles::m_keydownBlockBitmap);
@@ -616,7 +632,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 buttonPlayMenuBack.ResetHoverState();
                 //m_state = GameState::GAME_LEVELS;
                 m_state = GameState::IN_GAME;
-                LoadLevel(1);
+                LoadLevel(4);
             } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
                 buttonPlayMenuGameLevels.ResetHoverState();
                 buttonPlayMenuCustomLevels.ResetHoverState();
@@ -650,7 +666,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 buttonPauseMenuRestart.ResetHoverState();
                 buttonPauseMenuOptions.ResetHoverState();
                 buttonPauseMenuQuit.ResetHoverState();
-                LoadLevel(1);
+                LoadLevel(4);
                 m_state = GameState::IN_GAME;
             } else if(buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
                 buttonPauseMenuResume.ResetHoverState();
