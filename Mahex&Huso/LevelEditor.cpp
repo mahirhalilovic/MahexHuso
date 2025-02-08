@@ -44,14 +44,14 @@ void LevelEditor::ConstructButtons() {
     m_buttonEdit = Button(1350, 650, 100, 50, L"EDIT");
     m_buttonSave = Button(1480, 650, 100, 50, L"SAVE");
 
-    //m_buttonCancel.SetFont(L"i pixel u", 26, false);
-    //m_buttonEdit.SetFont(L"i pixel u", 26, false);
-    //m_buttonSave.SetFont(L"i pixel u", 26, false);
-    //m_buttonTile.SetFont(L"i pixel u", 26, false);
-    //m_buttonMahexStart.SetFont(L"i pixel u", 26, false);
-    //m_buttonMahexEnd.SetFont(L"i pixel u", 26, false);
-    //m_buttonHusoStart.SetFont(L"i pixel u", 26, false);
-    //m_buttonHusoEnd.SetFont(L"i pixel u", 26, false);
+    m_buttonCancel.SetFont(L"i pixel u", 26, false);
+    m_buttonEdit.SetFont(L"i pixel u", 26, false);
+    m_buttonSave.SetFont(L"i pixel u", 26, false);
+    m_buttonTile.SetFont(L"i pixel u", 26, false);
+    m_buttonMahexStart.SetFont(L"i pixel u", 26, false);
+    m_buttonMahexEnd.SetFont(L"i pixel u", 26, false);
+    m_buttonHusoStart.SetFont(L"i pixel u", 26, false);
+    m_buttonHusoEnd.SetFont(L"i pixel u", 26, false);
 }
 
 void LevelEditor::RenderButtons(const HDC &hdc) {

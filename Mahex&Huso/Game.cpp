@@ -7,27 +7,18 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     m_backgroundPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     m_backgroundMaskPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
-    buttonMainMenuPlay = Button(500, 235, 200, 50, L"PLAY");
-    buttonMainMenuOptions = Button(500, 335, 200, 50, L"OPTIONS");
-    buttonMainMenuExit = Button(500, 435, 200, 50, L"EXIT");
-    buttonPlayMenuGameLevels = Button(500, 235, 200, 50, L"GAME LEVELS");
-    buttonPlayMenuCustomLevels = Button(500, 335, 200, 50, L"CUSTOM LEVELS");
-    buttonPlayMenuBack = Button(500, 435, 200, 50, L"BACK");
-    buttonPauseMenuResume = Button(0, 0, 200, 50, L"RESUME");
-    buttonPauseMenuRestart = Button(0, 0, 200, 50, L"RESTART");
-    buttonPauseMenuOptions = Button(0, 0, 200, 50, L"OPTIONS");
-    buttonPauseMenuQuit = Button(0, 0, 200, 50, L"QUIT");
+    ConstructButtons();
+    
+    m_label = Label(350, 50, 500, 100, L"MAHEX&&HUSO");
+    m_label.SetFont(L"i pixel u", 72, false);
 
-    buttonMainMenuPlay.SetFont(L"i pixel u", 26, false);
-    buttonMainMenuOptions.SetFont(L"i pixel u", 26, false);
-    buttonMainMenuExit.SetFont(L"i pixel u", 26, false);
-    buttonPlayMenuGameLevels.SetFont(L"i pixel u", 26, false);
-    buttonPlayMenuCustomLevels.SetFont(L"i pixel u", 26, false);
-    buttonPlayMenuBack.SetFont(L"i pixel u", 26, false);
-    buttonPauseMenuResume.SetFont(L"i pixel u", 26, false);
-    buttonPauseMenuRestart.SetFont(L"i pixel u", 26, false);
-    buttonPauseMenuOptions.SetFont(L"i pixel u", 26, false);
-    buttonPauseMenuQuit.SetFont(L"i pixel u", 26, false);
+    labelGameWinScore = Label(0, 0, 200, 40, L"");
+    labelGameWinHighScore = Label(0, 0, 200, 40, L"");
+    labelGameWinScore.SetFont(L"i pixel u", 24, false);
+    labelGameWinHighScore.SetFont(L"i pixel u", 24, false);
+
+    labelGameOver = Label(0, 0, 200, 50, L"GAME OVER!!");
+    labelGameOver.SetFont(L"i pixel u", 24, false);
 
     Mahex = Player{0, 0,
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
@@ -46,11 +37,105 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     m_levels.resize(5);
 
     m_coins = m_score = 0;
-    m_currentLevel = 4;
+    m_currentLevel = 2;
+}
+
+void Game::ConstructButtons() {
+    buttonBack = Button(950, 620, 200, 50, L"BACK");
+    buttonBack.SetFont(L"i pixel u", 26, false);
+
+    buttonMainMenuPlay = Button(500, 235, 200, 50, L"PLAY");
+    buttonMainMenuOptions = Button(500, 335, 200, 50, L"OPTIONS");
+    buttonMainMenuExit = Button(500, 435, 200, 50, L"EXIT");
+    buttonMainMenuPlay.SetFont(L"i pixel u", 26, false);
+    buttonMainMenuOptions.SetFont(L"i pixel u", 26, false);
+    buttonMainMenuExit.SetFont(L"i pixel u", 26, false);
+
+    buttonPlayMenuGameLevels = Button(500, 235, 200, 50, L"GAME LEVELS");
+    buttonPlayMenuCustomLevels = Button(500, 335, 200, 50, L"CUSTOM LEVELS");
+    buttonPlayMenuGameLevels.SetFont(L"i pixel u", 26, false);
+    buttonPlayMenuCustomLevels.SetFont(L"i pixel u", 26, false);
+
+    buttonCustomLevelsPlay = Button(450, 235, 300, 50, L"PLAY CUSTOM LEVEL");
+    buttonCustomLevelsEdit = Button(450, 335, 300, 50, L"CREATE CUSTOM LEVEL");
+    buttonCustomLevelsPlay.SetFont(L"i pixel u", 26, false);
+    buttonCustomLevelsEdit.SetFont(L"i pixel u", 26, false);
+
+    buttonPauseMenuResume = Button(0, 0, 200, 50, L"RESUME");
+    buttonPauseMenuRestart = Button(0, 0, 200, 50, L"RESTART");
+    buttonPauseMenuOptions = Button(0, 0, 200, 50, L"OPTIONS");
+    buttonPauseMenuQuit = Button(0, 0, 200, 50, L"QUIT");
+    buttonPauseMenuResume.SetFont(L"i pixel u", 26, false);
+    buttonPauseMenuRestart.SetFont(L"i pixel u", 26, false);
+    buttonPauseMenuOptions.SetFont(L"i pixel u", 26, false);
+    buttonPauseMenuQuit.SetFont(L"i pixel u", 26, false);
+
+    buttonGameWinNext = Button(0, 0, 200, 50, L"NEXT");
+    buttonGameWinRestart = Button(0, 0, 200, 50, L"RESTART");
+    buttonGameWinQuit = Button(0, 0, 200, 50, L"QUIT");
+    buttonGameWinNext.SetFont(L"i pixel u", 26, false);
+    buttonGameWinRestart.SetFont(L"i pixel u", 26, false);
+    buttonGameWinQuit.SetFont(L"i pixel u", 26, false);
+
+    buttonGameOverRestart = Button(0, 0, 200, 50, L"RESTART");
+    buttonGameOverQuit = Button(0, 0, 200, 50, L"QUIT");
+    buttonGameOverRestart.SetFont(L"i pixel u", 26, false);
+    buttonGameOverQuit.SetFont(L"i pixel u", 26, false);
+}
+
+void Game::CheckHoverStatus(const POINT &mousePos) {
+    buttonBack.ResetHoverState();
+
+    buttonMainMenuPlay.ResetHoverState();
+    buttonMainMenuOptions.ResetHoverState();
+    buttonMainMenuExit.ResetHoverState();
+
+    buttonPlayMenuGameLevels.ResetHoverState();
+    buttonPlayMenuCustomLevels.ResetHoverState();
+
+    buttonCustomLevelsPlay.ResetHoverState();
+    buttonCustomLevelsEdit.ResetHoverState();
+
+    buttonPauseMenuResume.ResetHoverState();
+    buttonPauseMenuRestart.ResetHoverState();
+    buttonPauseMenuOptions.ResetHoverState();
+    buttonPauseMenuQuit.ResetHoverState();
+
+    buttonGameWinNext.ResetHoverState();
+    buttonGameWinRestart.ResetHoverState();
+    buttonGameWinQuit.ResetHoverState();
+
+    buttonGameOverRestart.ResetHoverState();
+    buttonGameOverQuit.ResetHoverState();
+
+    buttonBack.hovered = buttonBack.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
+    buttonMainMenuOptions.hovered = buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
+    buttonMainMenuExit.hovered = buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonPlayMenuGameLevels.hovered = buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y);
+    buttonPlayMenuCustomLevels.hovered = buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonCustomLevelsPlay.hovered = buttonCustomLevelsPlay.IsMouseOver(mousePos.x, mousePos.y);
+    buttonCustomLevelsEdit.hovered = buttonCustomLevelsEdit.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonPauseMenuResume.hovered = buttonPauseMenuResume.IsMouseOver(mousePos.x, mousePos.y);
+    buttonPauseMenuRestart.hovered = buttonPauseMenuRestart.IsMouseOver(mousePos.x, mousePos.y);
+    buttonPauseMenuOptions.hovered = buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
+    buttonPauseMenuQuit.hovered = buttonPauseMenuQuit.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonGameWinNext.hovered = buttonGameWinNext.IsMouseOver(mousePos.x, mousePos.y);
+    buttonGameWinRestart.hovered = buttonGameWinRestart.IsMouseOver(mousePos.x, mousePos.y);
+    buttonGameWinQuit.hovered = buttonGameWinQuit.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonGameOverRestart.hovered = buttonGameOverRestart.IsMouseOver(mousePos.x, mousePos.y);
+    buttonGameOverQuit.hovered = buttonGameOverQuit.IsMouseOver(mousePos.x, mousePos.y);
 }
 
 void Game::Update() {
     CheckInput();
+
     if(m_state == GameState::IN_GAME) {
         CheckWinningCondition();
         m_activePressureBlocks.clear();
@@ -58,77 +143,12 @@ void Game::Update() {
         UpdatePlayer(Mahex);
         UpdatePlayer(Huso);
 
-        for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
-            if(tile.m_type == TileType::PRESSURE_BLOCK) {
-                tile.m_active = (m_activePressureBlocks.find(tile.m_id) != m_activePressureBlocks.end());
-            }
-        }
-
-        std::unordered_map<int, Tile*> plateMap;
-        for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
-            if(plate.m_type == TileType::PRESSURE_PLATE_START) {
-                plateMap[plate.m_id] = &plate;
-            }
-        }
-
-        for(Tile &tile : m_levels[m_currentLevel - 1].m_tiles) {
-            if(tile.m_type == TileType::PRESSURE_BLOCK) {
-                if(tile.m_active) {
-                    auto it = plateMap.find(tile.m_id);
-                    if(it != plateMap.end()) {
-                        Tile *plate = it->second;
-                        if(plate->m_orientation == Orientation::HORIZONTAL) {
-                            if(plate->m_startPos < plate->m_endPos) {
-                                if(plate->m_posY < plate->m_endPos) plate->m_posY += 1;
-                            } else {
-                                if(plate->m_posY > plate->m_endPos) {
-                                    plate->m_posY -= 1;
-
-                                    RECT intersect;
-                                    RECT mahexCheck = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_SIZE, Mahex.m_posY + PLAYER_SIZE + 1};
-                                    RECT husoCheck = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_SIZE, Huso.m_posY + PLAYER_SIZE + 1};
-                                    RECT tileCheck = {plate->m_posX, plate->m_posY, plate->m_posX + TILE_SIZE, plate->m_posY + TILE_SIZE};
-                                    if(IntersectRect(&intersect, &mahexCheck, &tileCheck)) {
-                                        Mahex.m_posY -= 1;
-                                    } else if(IntersectRect(&intersect, &husoCheck, &tileCheck)) {
-                                        Huso.m_posY -= 1;
-                                    }
-                                }
-                            }
-                        } else {
-                            if(plate->m_startPos < plate->m_endPos) {
-                                if(plate->m_posX < plate->m_endPos) plate->m_posX += 1;
-                            } else {
-                                if(plate->m_posX > plate->m_endPos) plate->m_posX -= 1;
-                            }
-                        }
-                    }
-                } else {
-                    auto it = plateMap.find(tile.m_id);
-                    if(it != plateMap.end()) {
-                        Tile *plate = it->second;
-                        if(plate->m_orientation == Orientation::HORIZONTAL) {
-                            if(plate->m_startPos < plate->m_endPos) {
-                                if(plate->m_posY > plate->m_startPos) plate->m_posY -= 1;
-                            } else {
-                                if(plate->m_posY < plate->m_startPos) plate->m_posY += 1;
-                            }
-                        } else {
-                            if(plate->m_startPos < plate->m_endPos) {
-                                if(plate->m_posX > plate->m_startPos) plate->m_posX += 1;
-                            } else {
-                                if(plate->m_posX < plate->m_startPos) plate->m_posX -= 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } else if(m_state == GameState::CUSTOM_LEVELS) {
+        CheckPressureBlocks();
+    } else if(m_state == GameState::LEVEL_EDITOR) {
         m_levelEditor.Update();
         if(m_levelEditor.shouldExitToMainMenu) {
             UpdateWindowSize(false);
-            m_state = GameState::MAIN_MENU;
+            m_state = GameState::CUSTOM_LEVELS;
             m_levelEditor.shouldExitToMainMenu = false;
         }
     }
@@ -160,12 +180,12 @@ void Game::UpdatePlayer(Player &player) {
         if(IntersectRect(&intersection, &groundCheck, &tileCheck)) {
             switch(tile.m_type) {
                 case TileType::SPIKES:
-                    // Signal game over
-                    LoadLevel(m_currentLevel);
+                    m_state = GameState::GAME_OVER;
                     return;
                 case TileType::KEYDOWN_PLATE:
                 case TileType::PRESSURE_PLATE_START:
-                    player.m_posY = tile.m_posY + 16;
+                    if(player.m_velY < 0.1f) continue;
+                    newPosY = tile.m_posY + 16 - PLAYER_SIZE;
                     player.m_grounded = true;
                     continue;
                 case TileType::PRESSURE_BLOCK:
@@ -193,7 +213,11 @@ void Game::UpdatePlayer(Player &player) {
                 player.m_velY = 0;
                 player.m_grounded = true;
             } else if(player.m_velY < 0 && currentRect.top >= tileCheck.bottom) {
-                newPosY = tileCheck.bottom;
+                if(tile.m_type == TileType::PRESSURE_PLATE_START || tile.m_type == TileType::KEYDOWN_PLATE) {
+                    newPosY = tileCheck.bottom - 16;
+                } else {
+                    newPosY = tileCheck.bottom;
+                }
                 player.m_velY = 0;
             } else if(player.m_velX > 0 && currentRect.right <= tileCheck.left) {
                 newPosX = tileCheck.left - PLAYER_SIZE;
@@ -207,6 +231,75 @@ void Game::UpdatePlayer(Player &player) {
 
     player.m_posX = newPosX;
     player.m_posY = newPosY;
+}
+
+void Game::CheckPressureBlocks() {
+    for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+        if(tile.m_type == TileType::PRESSURE_BLOCK) {
+            tile.m_active = (m_activePressureBlocks.find(tile.m_id) != m_activePressureBlocks.end());
+        }
+    }
+
+    std::unordered_map<int, Tile*> plateMap;
+    for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
+        if(plate.m_type == TileType::PRESSURE_PLATE_START) {
+            plateMap[plate.m_id] = &plate;
+        }
+    }
+
+    for(Tile &tile : m_levels[m_currentLevel - 1].m_tiles) {
+        if(tile.m_type == TileType::PRESSURE_BLOCK) {
+            if(tile.m_active) {
+                auto it = plateMap.find(tile.m_id);
+                if(it != plateMap.end()) {
+                    Tile *plate = it->second;
+                    if(plate->m_orientation == Orientation::HORIZONTAL) {
+                        if(plate->m_startPos < plate->m_endPos) {
+                            if(plate->m_posY < plate->m_endPos) plate->m_posY += 1;
+                        } else {
+                            if(plate->m_posY > plate->m_endPos) {
+                                plate->m_posY -= 1;
+
+                                RECT intersect;
+                                RECT mahexCheck = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_SIZE, Mahex.m_posY + PLAYER_SIZE + 1};
+                                RECT husoCheck = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_SIZE, Huso.m_posY + PLAYER_SIZE + 1};
+                                RECT tileCheck = {plate->m_posX, plate->m_posY, plate->m_posX + TILE_SIZE, plate->m_posY + TILE_SIZE};
+                                if(IntersectRect(&intersect, &mahexCheck, &tileCheck)) {
+                                    Mahex.m_posY -= 1;
+                                } else if(IntersectRect(&intersect, &husoCheck, &tileCheck)) {
+                                    Huso.m_posY -= 1;
+                                }
+                            }
+                        }
+                    } else {
+                        if(plate->m_startPos < plate->m_endPos) {
+                            if(plate->m_posX < plate->m_endPos) plate->m_posX += 1;
+                        } else {
+                            if(plate->m_posX > plate->m_endPos) plate->m_posX -= 1;
+                        }
+                    }
+                }
+            } else {
+                auto it = plateMap.find(tile.m_id);
+                if(it != plateMap.end()) {
+                    Tile *plate = it->second;
+                    if(plate->m_orientation == Orientation::HORIZONTAL) {
+                        if(plate->m_startPos < plate->m_endPos) {
+                            if(plate->m_posY > plate->m_startPos) plate->m_posY -= 1;
+                        } else {
+                            if(plate->m_posY < plate->m_startPos) plate->m_posY += 1;
+                        }
+                    } else {
+                        if(plate->m_startPos < plate->m_endPos) {
+                            if(plate->m_posX > plate->m_startPos) plate->m_posX += 1;
+                        } else {
+                            if(plate->m_posX < plate->m_startPos) plate->m_posX -= 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Game::Render() {
@@ -243,6 +336,16 @@ void Game::Render() {
             RenderInGame();
             RenderPause();
             break;
+
+        case GameState::GAME_WIN:
+            RenderInGame();
+            RenderGameWin();
+            break;
+
+        case GameState::GAME_OVER:
+            RenderInGame();
+            RenderGameOver();
+            break;
     }
 }
 
@@ -260,6 +363,7 @@ void Game::RenderMainMenu() {
     SelectObject(hdcMem, m_backgroundMaskMainMenu);
     BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
 
+    m_label.Render(hdcBuffer);
     buttonMainMenuPlay.Render(hdcBuffer);
     buttonMainMenuOptions.Render(hdcBuffer);
     buttonMainMenuExit.Render(hdcBuffer);
@@ -290,7 +394,7 @@ void Game::RenderPlayMenu() {
 
     buttonPlayMenuGameLevels.Render(hdcBuffer);
     buttonPlayMenuCustomLevels.Render(hdcBuffer);
-    buttonPlayMenuBack.Render(hdcBuffer);
+    buttonBack.Render(hdcBuffer);
 
     BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBuffer, 0, 0, SRCCOPY);
 
@@ -302,10 +406,36 @@ void Game::RenderPlayMenu() {
     ReleaseDC(m_hwnd, hdc);
 }
 
-void Game::RenderGameLevels() {}
+void Game::RenderGameLevels() {
+    
+}
 
 void Game::RenderCustomLevels() {
-    m_levelEditor.Render();
+    HDC hdc = GetDC(m_hwnd);
+    HDC hdcBuffer = CreateCompatibleDC(hdc);
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+    HBITMAP hbmBuffer = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
+    HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
+
+    SelectObject(hdcMem, m_backgroundMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCPAINT);
+    SelectObject(hdcMem, m_backgroundMaskMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
+
+    buttonCustomLevelsPlay.Render(hdcBuffer);
+    buttonCustomLevelsEdit.Render(hdcBuffer);
+    buttonBack.Render(hdcBuffer);
+
+    BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBuffer, 0, 0, SRCCOPY);
+
+    DeleteDC(hdcMem);
+    DeleteObject(hbmBuffer);
+    SelectObject(hdcBuffer, hbmOldBuffer);
+    DeleteObject(hbmOldBuffer);
+    DeleteDC(hdcBuffer);
+    ReleaseDC(m_hwnd, hdc);
 }
 
 void Game::RenderLevelEditor() {
@@ -363,10 +493,10 @@ void Game::RenderPause() {
     int rectX = (clientRect.right - rectWidth) / 2;
     int finalRectY = (clientRect.bottom - rectHeight) / 2;
 
-    if(!m_animationInProgress) {
+    if(!m_animationInProgressPause) {
         m_pauseMenuY = -rectHeight;
         m_pauseTargetY = finalRectY;
-        m_animationInProgress = true;
+        m_animationInProgressPause = true;
     }
 
     if(m_pauseMenuY < m_pauseTargetY) {
@@ -393,6 +523,110 @@ void Game::RenderPause() {
     buttonPauseMenuRestart.Render(hdc);
     buttonPauseMenuOptions.Render(hdc);
     buttonPauseMenuQuit.Render(hdc);
+
+    DeleteObject(backgroundBrush);
+    SelectObject(hdc, oldPen);
+    DeleteObject(pen);
+
+    ReleaseDC(m_hwnd, hdc);
+}
+
+void Game::RenderGameWin() {
+    HDC hdc = GetDC(m_hwnd);
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+
+    int rectWidth = 300;
+    int rectHeight = 350;
+    int rectX = (clientRect.right - rectWidth) / 2;
+    int finalRectY = (clientRect.bottom - rectHeight) / 2;
+
+    if(!m_animationInProgressGameWin) {
+        m_gameWinMenuY = -rectHeight;
+        m_gameWinTargetY = finalRectY;
+        m_animationInProgressGameWin = true;
+    }
+
+    if(m_gameWinMenuY < m_gameWinTargetY) {
+        m_gameWinMenuY += (m_gameWinTargetY - m_gameWinMenuY) * 0.1f;
+        if(m_gameWinTargetY - m_gameWinMenuY < 0.5f) {
+            m_gameWinMenuY = m_gameWinTargetY;
+        }
+    }
+
+    HBRUSH backgroundBrush = CreateSolidBrush(0xccb366);
+    RECT pauseRect = {rectX, (int) m_gameWinMenuY, rectX + rectWidth, (int) m_gameWinMenuY + rectHeight};
+    FillRect(hdc, &pauseRect, backgroundBrush);
+
+    HPEN pen = CreatePen(PS_SOLID, 2, 0xb3922d);
+    HPEN oldPen = (HPEN) SelectObject(hdc, pen);
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
+    Rectangle(hdc, rectX, (int) m_gameWinMenuY, rectX + rectWidth, (int) m_gameWinMenuY + rectHeight);
+
+    std::wstring str = L"SCORE: " + std::to_wstring(m_coins);
+
+    labelGameWinScore.SetText(str);
+    labelGameWinHighScore.SetText(L"NEW HIGH SCORE!");
+
+    labelGameWinScore.SetPos(rectX + 50, m_gameWinMenuY + 20);
+    labelGameWinHighScore.SetPos(rectX + 50, m_gameWinMenuY + 60);
+
+    labelGameWinScore.Render(hdc);
+    labelGameWinHighScore.Render(hdc);
+    
+    buttonGameWinNext.SetPos(rectX + 50, m_gameWinMenuY + 140);
+    buttonGameWinRestart.SetPos(rectX + 50, m_gameWinMenuY + 210);
+    buttonGameWinQuit.SetPos(rectX + 50, m_gameWinMenuY + 280);
+    buttonGameWinNext.Render(hdc);
+    buttonGameWinRestart.Render(hdc);
+    buttonGameWinQuit.Render(hdc);
+
+    DeleteObject(backgroundBrush);
+    SelectObject(hdc, oldPen);
+    DeleteObject(pen);
+
+    ReleaseDC(m_hwnd, hdc);
+}
+
+void Game::RenderGameOver() {
+    HDC hdc = GetDC(m_hwnd);
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+
+    int rectWidth = 300;
+    int rectHeight = 250;
+    int rectX = (clientRect.right - rectWidth) / 2;
+    int finalRectY = (clientRect.bottom - rectHeight) / 2;
+
+    if(!m_animationInProgressGameOver) {
+        m_gameOverMenuY = -rectHeight;
+        m_gameOverTargetY = finalRectY;
+        m_animationInProgressGameOver = true;
+    }
+
+    if(m_gameOverMenuY < m_gameOverTargetY) {
+        m_gameOverMenuY += (m_gameOverTargetY - m_gameOverMenuY) * 0.1f;
+        if(m_gameOverTargetY - m_gameOverMenuY < 0.5f) {
+            m_gameOverMenuY = m_gameOverTargetY;
+        }
+    }
+
+    HBRUSH backgroundBrush = CreateSolidBrush(0xccb366);
+    RECT pauseRect = {rectX, (int) m_gameOverMenuY, rectX + rectWidth, (int) m_gameOverMenuY + rectHeight};
+    FillRect(hdc, &pauseRect, backgroundBrush);
+
+    HPEN pen = CreatePen(PS_SOLID, 2, 0xb3922d);
+    HPEN oldPen = (HPEN) SelectObject(hdc, pen);
+    SelectObject(hdc, GetStockObject(NULL_BRUSH));
+    Rectangle(hdc, rectX, (int) m_gameOverMenuY, rectX + rectWidth, (int) m_gameOverMenuY + rectHeight);
+
+    labelGameOver.SetPos(rectX + 50, m_gameOverMenuY + 20);
+    labelGameOver.Render(hdc);
+
+    buttonGameOverRestart.SetPos(rectX + 50, m_gameOverMenuY + 110);
+    buttonGameOverQuit.SetPos(rectX + 50, m_gameOverMenuY + 180);
+    buttonGameOverRestart.Render(hdc);
+    buttonGameOverQuit.Render(hdc);
 
     DeleteObject(backgroundBrush);
     SelectObject(hdc, oldPen);
@@ -496,39 +730,7 @@ void Game::CheckInput() {
     GetCursorPos(&mousePos);
     ScreenToClient(m_hwnd, &mousePos);
 
-    //ResetButtonHoverStates();
-
-    buttonMainMenuPlay.ResetHoverState();
-    buttonMainMenuOptions.ResetHoverState();
-    buttonMainMenuExit.ResetHoverState();
-    buttonPlayMenuGameLevels.ResetHoverState();
-    buttonPlayMenuCustomLevels.ResetHoverState();
-    buttonPlayMenuBack.ResetHoverState();
-    buttonPauseMenuResume.ResetHoverState();
-    buttonPauseMenuRestart.ResetHoverState();
-    buttonPauseMenuOptions.ResetHoverState();
-    buttonPauseMenuQuit.ResetHoverState();
-
-    switch(m_state) {
-        case GameState::MAIN_MENU:
-            buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
-            buttonMainMenuOptions.hovered = buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
-            buttonMainMenuExit.hovered = buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y);
-            break;
-
-        case GameState::PLAY_MENU:
-            buttonPlayMenuGameLevels.hovered = buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y);
-            buttonPlayMenuCustomLevels.hovered = buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y);
-            buttonPlayMenuBack.hovered = buttonPlayMenuBack.IsMouseOver(mousePos.x, mousePos.y);
-            break;
-
-        case GameState::PAUSE:
-            buttonPauseMenuResume.hovered = buttonPauseMenuResume.IsMouseOver(mousePos.x, mousePos.y);
-            buttonPauseMenuRestart.hovered = buttonPauseMenuRestart.IsMouseOver(mousePos.x, mousePos.y);
-            buttonPauseMenuOptions.hovered = buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y);
-            buttonPauseMenuQuit.hovered = buttonPauseMenuQuit.IsMouseOver(mousePos.x, mousePos.y);
-            break;
-    }
+    CheckHoverStatus(mousePos);
 
     if(IsKeyPressed(VK_LEFT)) {
         Mahex.m_direction = DIRECTION_LEFT;
@@ -578,6 +780,25 @@ void Game::CheckInput() {
         Huso.m_velY = -JUMP_HEIGHT;
         Huso.m_grounded = false;
     }
+    if(IsKeyPressed('S')) {
+        int tileX = Huso.m_posX / TILE_SIZE;
+        int tileY = (Huso.m_posY + PLAYER_SIZE) / TILE_SIZE;
+
+        for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+            int currentTileX = tile.m_posX / TILE_SIZE;
+            int currentTileY = tile.m_posY / TILE_SIZE;
+
+            if(currentTileX == tileX && currentTileY == tileY) {
+                if(tile.m_type == TileType::KEYDOWN_BLOCK) {
+                    for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
+                        if(plate.m_id == tile.m_id)
+                            plate.m_active = true;
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
     if(IsKeyPressed(VK_ESCAPE)) {
         if(!m_escapeButtonPressed) {
@@ -586,7 +807,7 @@ void Game::CheckInput() {
                 m_state = GameState::PAUSE;
             } else if(m_state == GameState::PAUSE) {
                 m_state = GameState::IN_GAME;
-                m_animationInProgress = false;
+                m_animationInProgressPause = false;
             }
         }
     } else {
@@ -611,14 +832,8 @@ void Game::ProcessMouseClick(POINT mousePos) {
     switch(m_state) {
         case GameState::MAIN_MENU:
             if(buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonMainMenuPlay.ResetHoverState();
-                buttonMainMenuOptions.ResetHoverState();
-                buttonMainMenuExit.ResetHoverState();
                 m_state = GameState::PLAY_MENU;
             } else if(buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonMainMenuPlay.ResetHoverState();
-                buttonMainMenuOptions.ResetHoverState();
-                buttonMainMenuExit.ResetHoverState();
                 m_state = GameState::OPTIONS;
             } else if(buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y)) {
                 SendMessage(m_hwnd, WM_CLOSE, 0, 0);
@@ -627,59 +842,66 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
         case GameState::PLAY_MENU:
             if(buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPlayMenuGameLevels.ResetHoverState();
-                buttonPlayMenuCustomLevels.ResetHoverState();
-                buttonPlayMenuBack.ResetHoverState();
                 //m_state = GameState::GAME_LEVELS;
                 m_state = GameState::IN_GAME;
-                LoadLevel(4);
+                LoadLevel(m_currentLevel);
             } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPlayMenuGameLevels.ResetHoverState();
-                buttonPlayMenuCustomLevels.ResetHoverState();
-                buttonPlayMenuBack.ResetHoverState();
-                m_levelEditor = LevelEditor(m_hwnd);
                 m_state = GameState::CUSTOM_LEVELS;
-                UpdateWindowSize(true);
-            } else if(buttonPlayMenuBack.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPlayMenuGameLevels.ResetHoverState();
-                buttonPlayMenuCustomLevels.ResetHoverState();
-                buttonPlayMenuBack.ResetHoverState();
+            } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
             }
             break;
 
         case GameState::GAME_LEVELS:
+            break;
+
         case GameState::CUSTOM_LEVELS:
+            if(buttonCustomLevelsPlay.IsMouseOver(mousePos.x, mousePos.y)) {
+                //
+            } else if(buttonCustomLevelsEdit.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_state = GameState::LEVEL_EDITOR;
+                m_levelEditor = LevelEditor(m_hwnd);
+                UpdateWindowSize(true);
+            } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_state = GameState::PLAY_MENU;
+            }
+            break;
+
         case GameState::LEVEL_EDITOR:
         case GameState::OPTIONS:
         case GameState::IN_GAME:
             break;
+
         case GameState::PAUSE:
             if(buttonPauseMenuResume.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPauseMenuResume.ResetHoverState();
-                buttonPauseMenuRestart.ResetHoverState();
-                buttonPauseMenuOptions.ResetHoverState();
-                buttonPauseMenuQuit.ResetHoverState();
                 m_state = GameState::IN_GAME;
             } else if(buttonPauseMenuRestart.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPauseMenuResume.ResetHoverState();
-                buttonPauseMenuRestart.ResetHoverState();
-                buttonPauseMenuOptions.ResetHoverState();
-                buttonPauseMenuQuit.ResetHoverState();
-                LoadLevel(4);
+                LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
             } else if(buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPauseMenuResume.ResetHoverState();
-                buttonPauseMenuRestart.ResetHoverState();
-                buttonPauseMenuOptions.ResetHoverState();
-                buttonPauseMenuQuit.ResetHoverState();
                 //m_state = GameState::OPTIONS;
                 m_state = GameState::IN_GAME;
             } else if(buttonPauseMenuQuit.IsMouseOver(mousePos.x, mousePos.y)) {
-                buttonPauseMenuResume.ResetHoverState();
-                buttonPauseMenuRestart.ResetHoverState();
-                buttonPauseMenuOptions.ResetHoverState();
-                buttonPauseMenuQuit.ResetHoverState();
+                m_state = GameState::MAIN_MENU;
+            }
+            break;
+
+        case GameState::GAME_WIN:
+            if(buttonGameWinNext.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_state = GameState::MAIN_MENU;
+            } else if(buttonGameWinRestart.IsMouseOver(mousePos.x, mousePos.y)) {
+                LoadLevel(m_currentLevel);
+                m_state = GameState::IN_GAME;
+            } else if(buttonGameWinQuit.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_state = GameState::MAIN_MENU;
+            }
+            break;
+
+        case GameState::GAME_OVER:
+            if(buttonGameOverRestart.IsMouseOver(mousePos.x, mousePos.y)) {
+                LoadLevel(m_currentLevel);
+                m_state = GameState::IN_GAME;
+            } else if(buttonGameOverQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
             }
             break;
@@ -690,10 +912,6 @@ void Game::LoadLevel(int newLevel) {
     std::string path = m_currentWorkingDirectory + "/levels/level";
     path += std::to_string(newLevel);
     path += ".json";
-
-    //std::wstring wstr(path.begin(), path.end());
-
-    //MessageBox(m_hwnd, wstr.c_str(), L"Loading path", MB_OK);
 
     LoadLevelFromJSON(path, newLevel - 1);
 
@@ -718,7 +936,7 @@ void Game::CheckWinningCondition() {
 
     for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
         RECT intersection;
-        RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + TILE_SIZE, tile.m_posY + TILE_SIZE};
+        RECT tileCheck = {tile.m_posX + 22, tile.m_posY + 44, tile.m_posX + 26, tile.m_posY + 48};
         
         if(tile.m_type == TileType::MAHEX_END) {
             mahexEnd = IntersectRect(&intersection, &currentMahexRect, &tileCheck);
@@ -730,7 +948,7 @@ void Game::CheckWinningCondition() {
     }
 
     if(mahexEnd && husoEnd) {
-        if(MessageBox(m_hwnd, L"GAME WON", L"WIN", MB_OK) == IDOK) m_state = GameState::MAIN_MENU;
+        m_state = GameState::GAME_WIN;
     }
 }
 

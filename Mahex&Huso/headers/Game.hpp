@@ -9,9 +9,10 @@
 
 #include "Player.hpp"
 #include "Level.hpp"
+#include "LevelEditor.hpp"
 #include "Display.hpp"
 #include "Button.hpp"
-#include "LevelEditor.hpp"
+#include "Label.hpp"
 
 using json = nlohmann::json;
 
@@ -45,7 +46,9 @@ class Game {
 			LEVEL_EDITOR,
 			OPTIONS,
 			IN_GAME,
-			PAUSE
+			PAUSE,
+			GAME_WIN,
+			GAME_OVER
 		};
 
 		GameState m_state = GameState::MAIN_MENU;
@@ -71,12 +74,28 @@ class Game {
 		bool m_escapeButtonPressed = false;
 		float m_pauseMenuY = -300.0f;
 		float m_pauseTargetY = 0.0f;
-		bool m_animationInProgress = false;
+		bool m_animationInProgressPause = false;
+
+		float m_gameWinMenuY = -350.0f;
+		float m_gameWinTargetY = 0.0f;
+		bool m_animationInProgressGameWin = false;
+
+		float m_gameOverMenuY = -250.0f;
+		float m_gameOverTargetY = 0.0f;
+		bool m_animationInProgressGameOver = false;
+
+		Label m_label;
+		Label labelGameWinScore, labelGameWinHighScore;
+		Label labelGameOver;
 
 		bool m_mouseButtonPressed = false;
+		Button buttonBack;
 		Button buttonMainMenuPlay, buttonMainMenuOptions, buttonMainMenuExit;
-		Button buttonPlayMenuGameLevels, buttonPlayMenuCustomLevels, buttonPlayMenuBack;
+		Button buttonPlayMenuGameLevels, buttonPlayMenuCustomLevels;
+		Button buttonCustomLevelsPlay, buttonCustomLevelsEdit;
 		Button buttonPauseMenuResume, buttonPauseMenuRestart, buttonPauseMenuOptions, buttonPauseMenuQuit;
+		Button buttonGameWinNext, buttonGameWinRestart, buttonGameWinQuit;
+		Button buttonGameOverRestart, buttonGameOverQuit;
 
 		HANDLE m_fontHandle = nullptr;
 		HFONT m_customFont = nullptr;
@@ -84,6 +103,9 @@ class Game {
 		bool m_fullscreen = false;
 		int m_winWidth = 1920;
 		int m_winHeight = 1080;
+
+		void ConstructButtons();
+		void CheckHoverStatus(const POINT &mousePos);
 
 		void RenderMainMenu();
 		void RenderPlayMenu();
@@ -93,9 +115,11 @@ class Game {
 		void RenderOptions();
 		void RenderInGame();
 		void RenderPause();
-		void RenderWin() {}
-		void RenderGameOver() {}
+		void RenderGameWin();
+		void RenderGameOver();
 		void RenderTiles(const HDC&, const HDC&);
+
+		void CheckPressureBlocks();
 
 		void UpdatePlayer(Player&);
 		void CheckInput();
@@ -105,7 +129,6 @@ class Game {
 
 		void LoadLevel(int);
 		bool LoadLevelFromJSON(std::string, int);
-
 		Tile LoadTile(const json&);
 
 		void UpdateWindowSize(bool isEditor);

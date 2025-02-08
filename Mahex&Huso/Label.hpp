@@ -3,22 +3,19 @@
 #include <windows.h>
 #include <string>
 
-class Button {
+class Label {
     public:
     int x, y, width, height;
     std::wstring text;
-    bool hovered = false;
     HFONT font = nullptr;
     COLORREF textColor = RGB(0, 0, 0);
-    COLORREF bgColor = RGB(150, 150, 150);
-    COLORREF hoverBgColor = RGB(200, 200, 200);
 
-    Button() = default;
+    Label() = default;
 
-    Button(int x, int y, int width, int height, const std::wstring &text)
+    Label(int x, int y, int width, int height, const std::wstring &text)
         : x(x), y(y), width(width), height(height), text(text) {}
 
-    ~Button() {
+    ~Label() {
         if(font) DeleteObject(font);
     }
 
@@ -38,18 +35,15 @@ class Button {
         y = posY;
     }
 
-    bool IsMouseOver(int mouseX, int mouseY) {
-        return mouseX >= x && mouseX <= x + width &&
-            mouseY >= y && mouseY <= y + height;
+    void SetText(const std::wstring &txt) {
+        text.clear();
+        text = std::move(txt);
     }
 
     void Render(HDC hdc) {
         int savedDC = SaveDC(hdc);
 
-        HBRUSH bgBrush = CreateSolidBrush(hovered ? hoverBgColor : bgColor);
         RECT rect = {x, y, x + width, y + height};
-        FillRect(hdc, &rect, bgBrush);
-        DeleteObject(bgBrush);
 
         if(font) {
             SelectObject(hdc, font);
@@ -61,9 +55,5 @@ class Button {
         DrawText(hdc, text.c_str(), text.length(), &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
         RestoreDC(hdc, savedDC);
-    }
-
-    void ResetHoverState() {
-        hovered = false;
     }
 };

@@ -143,6 +143,7 @@
     <ClInclude Include="headers\Object.hpp" />
     <ClInclude Include="headers\Player.hpp" />
     <ClInclude Include="headers\Tiles.hpp" />
+    <ClInclude Include="Label.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\tile.bmp" />
