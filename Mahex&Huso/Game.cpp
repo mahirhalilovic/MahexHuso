@@ -141,6 +141,7 @@ void Game::CheckHoverStatus(const POINT &mousePos) {
     buttonOptionsMusic.ResetHoverState();
     buttonOptionsSoundEffects.ResetHoverState();
 
+
     buttonBack.hovered = buttonBack.IsMouseOver(mousePos.x, mousePos.y);
 
     buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
@@ -293,7 +294,7 @@ void Game::CheckPressureBlocks() {
                 auto it = plateMap.find(tile.m_id);
                 if(it != plateMap.end()) {
                     Tile *plate = it->second;
-                    if(plate->m_orientation == Orientation::HORIZONTAL) {
+                    if(plate->m_movement == Orientation::VERTICAL) {
                         if(plate->m_startPos < plate->m_endPos) {
                             if(plate->m_posY < plate->m_endPos) plate->m_posY += 1;
                         } else {
@@ -323,7 +324,7 @@ void Game::CheckPressureBlocks() {
                 auto it = plateMap.find(tile.m_id);
                 if(it != plateMap.end()) {
                     Tile *plate = it->second;
-                    if(plate->m_orientation == Orientation::HORIZONTAL) {
+                    if(plate->m_movement == Orientation::VERTICAL) {
                         if(plate->m_startPos < plate->m_endPos) {
                             if(plate->m_posY > plate->m_startPos) plate->m_posY -= 1;
                         } else {
@@ -331,9 +332,9 @@ void Game::CheckPressureBlocks() {
                         }
                     } else {
                         if(plate->m_startPos < plate->m_endPos) {
-                            if(plate->m_posX > plate->m_startPos) plate->m_posX += 1;
+                            if(plate->m_posX > plate->m_startPos) plate->m_posX -= 1;
                         } else {
-                            if(plate->m_posX < plate->m_startPos) plate->m_posX -= 1;
+                            if(plate->m_posX < plate->m_startPos) plate->m_posX += 1;
                         }
                     }
                 }
@@ -689,10 +690,12 @@ void Game::RenderGameWin() {
     labelGameWinScore.Render(hdc);
     labelGameWinHighScore.Render(hdc);
     
-    buttonGameWinNext.SetPos(rectX + 50, m_gameWinMenuY + 140);
+    if(!customLevelPlaying && m_currentLevel < 5) {
+        buttonGameWinNext.SetPos(rectX + 50, m_gameWinMenuY + 140);
+        buttonGameWinNext.Render(hdc);
+    }
     buttonGameWinRestart.SetPos(rectX + 50, m_gameWinMenuY + 210);
     buttonGameWinQuit.SetPos(rectX + 50, m_gameWinMenuY + 280);
-    buttonGameWinNext.Render(hdc);
     buttonGameWinRestart.Render(hdc);
     buttonGameWinQuit.Render(hdc);
 
@@ -1033,7 +1036,9 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
         case GameState::GAME_WIN:
             if(buttonGameWinNext.IsMouseOver(mousePos.x, mousePos.y)) {
-                m_state = GameState::MAIN_MENU;
+                ++m_currentLevel;
+                LoadLevel(m_currentLevel);
+                m_state = GameState::IN_GAME;
             } else if(buttonGameWinRestart.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
@@ -1163,6 +1168,7 @@ Tile Game::LoadTile(const json &tileData) {
             newTile.m_orientation = m_levelEditor.StringToOrientation(tileData["orientation"]);
             newTile.m_startPos = tileData["startPos"];
             newTile.m_endPos = tileData["endPos"];
+            newTile.m_movement = m_levelEditor.StringToOrientation(tileData["movement"]);
             break;
     }
 

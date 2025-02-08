@@ -84,6 +84,7 @@ class Game {
 		bool m_animationInProgressGameOver = false;
 
 		bool musicEnabled = true, soundEffectsEnabled = true;
+		bool customLevelPlaying = false;
 
 		Label m_label;
 		Label labelGameLevelsScore;

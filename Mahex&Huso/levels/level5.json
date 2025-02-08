@@ -217,6 +217,7 @@
         {
             "endPos": 144,
             "id": 3,
+            "movement": "VERTICAL",
             "orientation": "HORIZONTAL",
             "startPos": 288,
             "type": "PRESSURE_PLATE_START",
@@ -254,10 +255,11 @@
             "y": 0
         },
         {
-            "endPos": 144,
-            "id": 2,
+            "endPos": 576,
+            "id": 6,
+            "movement": "HORIZONTAL",
             "orientation": "HORIZONTAL",
-            "startPos": 144,
+            "startPos": 336,
             "type": "PRESSURE_PLATE_START",
             "x": 336,
             "y": 144
@@ -384,7 +386,7 @@
             "y": 480
         },
         {
-            "type": "TILE",
+            "type": "SPIKES",
             "x": 720,
             "y": 672
         },
@@ -404,7 +406,7 @@
             "y": 480
         },
         {
-            "type": "TILE",
+            "type": "SPIKES",
             "x": 768,
             "y": 672
         },
@@ -414,7 +416,7 @@
             "y": 0
         },
         {
-            "type": "TILE",
+            "type": "SPIKES",
             "x": 816,
             "y": 672
         },
@@ -431,6 +433,7 @@
         {
             "endPos": 144,
             "id": 1,
+            "movement": "VERTICAL",
             "orientation": "HORIZONTAL",
             "startPos": 432,
             "type": "PRESSURE_PLATE_START",
@@ -478,6 +481,11 @@
             "y": 240
         },
         {
+            "type": "TILE",
+            "x": 960,
+            "y": 528
+        },
+        {
             "type": "MAHEX_START",
             "x": 960,
             "y": 624
@@ -518,7 +526,7 @@
             "y": 576
         },
         {
-            "type": "SPIKES",
+            "type": "TILE",
             "x": 1008,
             "y": 672
         },
@@ -545,7 +553,7 @@
             "y": 336
         },
         {
-            "id": 2,
+            "id": 6,
             "type": "PRESSURE_BLOCK",
             "x": 1056,
             "y": 384

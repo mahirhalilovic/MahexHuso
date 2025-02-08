@@ -28,6 +28,7 @@ struct Tile : Object {
     TileType m_type = TileType::NONE;
     int m_id = -1;
     Orientation m_orientation = Orientation::NONE;
+    Orientation m_movement = Orientation::NONE;
     int m_startPos = 0;
     int m_endPos = 0;
     bool m_active = false;

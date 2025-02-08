@@ -490,10 +490,19 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                 }
                 m_grid[x][y].m_id = m_currentID;
                 m_grid[x][y].m_orientation = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation;
-                if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation == Orientation::HORIZONTAL)
-                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
-                else
-                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
+                if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation == Orientation::HORIZONTAL) {
+                    if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX == m_grid[x][y].m_posX) {
+                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
+                    } else {
+                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
+                    }
+                } else {
+                    if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX == m_grid[x][y].m_posX) {
+                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
+                    } else {
+                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
+                    }
+                }
                 break;
         }
 
@@ -599,12 +608,13 @@ bool LevelEditor::SaveToFile(const std::string& filename) {
                         case TileType::PRESSURE_PLATE_START:
                             tileData.push_back({"id", m_grid[x][y].m_id});
                             tileData.push_back({"orientation", OrientationToString(m_grid[x][y].m_orientation)});
-                            if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
+                            if(m_grid[x][y].m_movement == Orientation::VERTICAL) {
                                 tileData.push_back({"startPos", y * 48});
                             } else {
                                 tileData.push_back({"startPos", x * 48});
                             }
-                            tileData.push_back({"endPos", m_grid[x][y].m_endPos * 48});
+                            tileData.push_back({"endPos", m_grid[x][y].m_endPos});
+                            tileData.push_back({"movement", OrientationToString(m_grid[x][y].m_movement)});
                             break;
                     }
 
@@ -681,8 +691,9 @@ void LevelEditor::LoadFromFile(const std::string& filename) {
                 m_grid[x][y].m_id = tileData["id"];
                 if(m_currentID < m_grid[x][y].m_id) m_currentID = m_grid[x][y].m_id;
                 m_grid[x][y].m_orientation = StringToOrientation(tileData["orientation"]);
+                m_grid[x][y].m_movement = StringToOrientation(tileData["movement"]);
                 m_grid[x][y].m_endPos = tileData["endPos"];
-                if(m_grid[x][y].m_orientation == Orientation::HORIZONTAL) {
+                if(m_grid[x][y].m_movement == Orientation::VERTICAL) {
                     int endPosY = m_grid[x][y].m_endPos / 48;
                     m_grid[x][endPosY].m_posX = x * 48;
                     m_grid[x][endPosY].m_posY = endPosY * 48;

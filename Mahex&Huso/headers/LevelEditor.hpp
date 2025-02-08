@@ -44,11 +44,6 @@ class LevelEditor {
 
     LevelEditorMenu m_selectedMenu;
 
-    //HBITMAP m_tileBitmap, m_tileMask, m_spikesBitmap, m_spikesMask, m_coinBitmap, m_coinMask;
-    //HBITMAP m_keydownBlockBitmap, m_keydownBlockMask, m_pressureBlockBitmap, m_pressureBlockMask;
-    //HBITMAP m_plateHorizontalBitmap, m_plateHorizontalMask, m_plateVerticalBitmap, m_plateVerticalMask;
-    //HBITMAP m_mahexEndBitmap, m_mahexEndMask, m_husoEndBitmap, m_husoEndMask;
-
     Button m_buttonMenuTile, m_buttonMenuMechanical, m_buttonMenuPlayer;
     Button m_buttonTile, m_buttonSpikes, m_buttonCoin;
     Button m_buttonKeydownBlock, m_buttonPressureBlock, m_buttonVertical, m_buttonHorizontal;
