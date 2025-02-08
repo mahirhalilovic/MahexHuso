@@ -38,6 +38,11 @@ class Button {
         y = posY;
     }
 
+    void SetText(const std::wstring &txt) {
+        text.clear();
+        text = std::move(txt);
+    }
+
     bool IsMouseOver(int mouseX, int mouseY) {
         return mouseX >= x && mouseX <= x + width &&
             mouseY >= y && mouseY <= y + height;

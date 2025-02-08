@@ -66,10 +66,9 @@ class Game {
 
 		Player Mahex, Huso;
 
-		HBITMAP m_backgroundMainMenu;
-		HBITMAP m_backgroundMaskMainMenu;
-		HBITMAP m_backgroundPauseMenu;
-		HBITMAP m_backgroundMaskPauseMenu;
+		HBITMAP m_backgroundMainMenu, m_backgroundMaskMainMenu;
+		HBITMAP m_backgroundPauseMenu, m_backgroundMaskPauseMenu;
+		HBITMAP m_bitmapLevelOne, m_bitmapLevelTwo, m_bitmapLevelThree, m_bitmapLevelFour, m_bitmapLevelFive;
 
 		bool m_escapeButtonPressed = false;
 		float m_pauseMenuY = -300.0f;
@@ -84,18 +83,24 @@ class Game {
 		float m_gameOverTargetY = 0.0f;
 		bool m_animationInProgressGameOver = false;
 
+		bool musicEnabled = true, soundEffectsEnabled = true;
+
 		Label m_label;
+		Label labelGameLevelsScore;
 		Label labelGameWinScore, labelGameWinHighScore;
 		Label labelGameOver;
+		Label labelOptionsMusic, labelOptionsSoundEffects;
 
 		bool m_mouseButtonPressed = false;
 		Button buttonBack;
 		Button buttonMainMenuPlay, buttonMainMenuOptions, buttonMainMenuExit;
 		Button buttonPlayMenuGameLevels, buttonPlayMenuCustomLevels;
+		Button buttonGameLevelsPrevious, buttonGameLevelsNext, buttonGameLevelsPlay;
 		Button buttonCustomLevelsPlay, buttonCustomLevelsEdit;
 		Button buttonPauseMenuResume, buttonPauseMenuRestart, buttonPauseMenuOptions, buttonPauseMenuQuit;
 		Button buttonGameWinNext, buttonGameWinRestart, buttonGameWinQuit;
 		Button buttonGameOverRestart, buttonGameOverQuit;
+		Button buttonOptionsMusic, buttonOptionsSoundEffects;
 
 		HANDLE m_fontHandle = nullptr;
 		HFONT m_customFont = nullptr;

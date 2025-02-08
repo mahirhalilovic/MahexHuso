@@ -1,0 +1,26 @@
+{
+    "levels": {
+        "level1": {
+            "finished": false,
+            "highscore": 0
+        },
+        "level2": {
+            "finished": false,
+            "highscore": 0
+        },
+        "level3": {
+            "finished": false,
+            "highscore": 0
+        },
+        "level4": {
+            "finished": false,
+            "highscore": 0
+        },
+        "level5": {
+            "finished": false,
+            "highscore": 0
+        }
+    },
+    "soundEffects": true,
+    "music": true
+}

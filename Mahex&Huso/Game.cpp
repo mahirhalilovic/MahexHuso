@@ -7,10 +7,17 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     m_backgroundPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     m_backgroundMaskPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
-    ConstructButtons();
-    
+    m_bitmapLevelOne = (HBITMAP) LoadImage(NULL, L"assets/level_images/level1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelTwo = (HBITMAP) LoadImage(NULL, L"assets/level_images/level2.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelThree = (HBITMAP) LoadImage(NULL, L"assets/level_images/level3.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelFour = (HBITMAP) LoadImage(NULL, L"assets/level_images/level4.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelFive = (HBITMAP) LoadImage(NULL, L"assets/level_images/level5.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
     m_label = Label(350, 50, 500, 100, L"MAHEX&&HUSO");
     m_label.SetFont(L"i pixel u", 72, false);
+
+    labelGameLevelsScore = Label(500, 50, 200, 50, L"SCORE: 0");
+    labelGameLevelsScore.SetFont(L"i pixel u", 24, false);
 
     labelGameWinScore = Label(0, 0, 200, 40, L"");
     labelGameWinHighScore = Label(0, 0, 200, 40, L"");
@@ -19,6 +26,11 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
 
     labelGameOver = Label(0, 0, 200, 50, L"GAME OVER!!");
     labelGameOver.SetFont(L"i pixel u", 24, false);
+
+    labelOptionsMusic = Label(350, 285, 300, 50, L"MUSIC: ON");
+    labelOptionsSoundEffects = Label(350, 385, 300, 50, L"SOUND EFFECTS: ON");
+    labelOptionsMusic.SetFont(L"i pixel u", 24, false);
+    labelOptionsSoundEffects.SetFont(L"i pixel u", 24, false);
 
     Mahex = Player{0, 0,
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
@@ -37,7 +49,9 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     m_levels.resize(5);
 
     m_coins = m_score = 0;
-    m_currentLevel = 2;
+    m_currentLevel = 1;
+
+    ConstructButtons();
 }
 
 void Game::ConstructButtons() {
@@ -55,6 +69,13 @@ void Game::ConstructButtons() {
     buttonPlayMenuCustomLevels = Button(500, 335, 200, 50, L"CUSTOM LEVELS");
     buttonPlayMenuGameLevels.SetFont(L"i pixel u", 26, false);
     buttonPlayMenuCustomLevels.SetFont(L"i pixel u", 26, false);
+
+    buttonGameLevelsNext = Button(950, 335, 200, 50, L"NEXT");
+    buttonGameLevelsPrevious = Button(50, 335, 200, 50, L"PREVIOUS");
+    buttonGameLevelsPlay = Button(500, 560, 200, 50, L"PLAY");
+    buttonGameLevelsNext.SetFont(L"i pixel u", 26, false);
+    buttonGameLevelsPrevious.SetFont(L"i pixel u", 26, false);
+    buttonGameLevelsPlay.SetFont(L"i pixel u", 26, false);
 
     buttonCustomLevelsPlay = Button(450, 235, 300, 50, L"PLAY CUSTOM LEVEL");
     buttonCustomLevelsEdit = Button(450, 335, 300, 50, L"CREATE CUSTOM LEVEL");
@@ -81,6 +102,11 @@ void Game::ConstructButtons() {
     buttonGameOverQuit = Button(0, 0, 200, 50, L"QUIT");
     buttonGameOverRestart.SetFont(L"i pixel u", 26, false);
     buttonGameOverQuit.SetFont(L"i pixel u", 26, false);
+
+    buttonOptionsMusic = Button(450, 285, 300, 50, L"MUSIC: ON");
+    buttonOptionsSoundEffects = Button(450, 385, 300, 50, L"SOUND EFFECTS: ON");
+    buttonOptionsMusic.SetFont(L"i pixel u", 26, false);
+    buttonOptionsSoundEffects.SetFont(L"i pixel u", 26, false);
 }
 
 void Game::CheckHoverStatus(const POINT &mousePos) {
@@ -92,6 +118,10 @@ void Game::CheckHoverStatus(const POINT &mousePos) {
 
     buttonPlayMenuGameLevels.ResetHoverState();
     buttonPlayMenuCustomLevels.ResetHoverState();
+
+    buttonGameLevelsNext.ResetHoverState();
+    buttonGameLevelsPrevious.ResetHoverState();
+    buttonGameLevelsPlay.ResetHoverState();
 
     buttonCustomLevelsPlay.ResetHoverState();
     buttonCustomLevelsEdit.ResetHoverState();
@@ -108,6 +138,9 @@ void Game::CheckHoverStatus(const POINT &mousePos) {
     buttonGameOverRestart.ResetHoverState();
     buttonGameOverQuit.ResetHoverState();
 
+    buttonOptionsMusic.ResetHoverState();
+    buttonOptionsSoundEffects.ResetHoverState();
+
     buttonBack.hovered = buttonBack.IsMouseOver(mousePos.x, mousePos.y);
 
     buttonMainMenuPlay.hovered = buttonMainMenuPlay.IsMouseOver(mousePos.x, mousePos.y);
@@ -116,6 +149,10 @@ void Game::CheckHoverStatus(const POINT &mousePos) {
 
     buttonPlayMenuGameLevels.hovered = buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y);
     buttonPlayMenuCustomLevels.hovered = buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonGameLevelsNext.hovered = buttonGameLevelsNext.IsMouseOver(mousePos.x, mousePos.y);
+    buttonGameLevelsPrevious.hovered = buttonGameLevelsPrevious.IsMouseOver(mousePos.x, mousePos.y);
+    buttonGameLevelsPlay.hovered = buttonGameLevelsPlay.IsMouseOver(mousePos.x, mousePos.y);
 
     buttonCustomLevelsPlay.hovered = buttonCustomLevelsPlay.IsMouseOver(mousePos.x, mousePos.y);
     buttonCustomLevelsEdit.hovered = buttonCustomLevelsEdit.IsMouseOver(mousePos.x, mousePos.y);
@@ -131,6 +168,9 @@ void Game::CheckHoverStatus(const POINT &mousePos) {
 
     buttonGameOverRestart.hovered = buttonGameOverRestart.IsMouseOver(mousePos.x, mousePos.y);
     buttonGameOverQuit.hovered = buttonGameOverQuit.IsMouseOver(mousePos.x, mousePos.y);
+
+    buttonOptionsMusic.hovered = buttonOptionsMusic.IsMouseOver(mousePos.x, mousePos.y);
+    buttonOptionsSoundEffects.hovered = buttonOptionsSoundEffects.IsMouseOver(mousePos.x, mousePos.y);
 }
 
 void Game::Update() {
@@ -407,7 +447,56 @@ void Game::RenderPlayMenu() {
 }
 
 void Game::RenderGameLevels() {
-    
+    HDC hdc = GetDC(m_hwnd);
+    HDC hdcBuffer = CreateCompatibleDC(hdc);
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+    HBITMAP hbmBuffer = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
+    HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
+
+    SelectObject(hdcMem, m_backgroundMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCPAINT);
+    SelectObject(hdcMem, m_backgroundMaskMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
+
+    Rectangle(hdcBuffer, 299, 179, 901, 541);
+
+    switch(m_currentLevel) {
+        case 1:
+            SelectObject(hdcMem, m_bitmapLevelOne);
+            break;
+        case 2:
+            SelectObject(hdcMem, m_bitmapLevelTwo);
+            break;
+        case 3:
+            SelectObject(hdcMem, m_bitmapLevelThree);
+            break;
+        case 4:
+            SelectObject(hdcMem, m_bitmapLevelFour);
+            break;
+        case 5:
+            SelectObject(hdcMem, m_bitmapLevelFive);
+            break;
+    }
+
+    BitBlt(hdcBuffer, 300, 180, 600, 360, hdcMem, 0, 0, SRCCOPY);
+
+    labelGameLevelsScore.Render(hdcBuffer);
+
+    buttonGameLevelsNext.Render(hdcBuffer);
+    buttonGameLevelsPrevious.Render(hdcBuffer);
+    buttonGameLevelsPlay.Render(hdcBuffer);
+    buttonBack.Render(hdcBuffer);
+
+    BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBuffer, 0, 0, SRCCOPY);
+
+    DeleteDC(hdcMem);
+    DeleteObject(hbmBuffer);
+    SelectObject(hdcBuffer, hbmOldBuffer);
+    DeleteObject(hbmOldBuffer);
+    DeleteDC(hdcBuffer);
+    ReleaseDC(m_hwnd, hdc);
 }
 
 void Game::RenderCustomLevels() {
@@ -442,7 +531,33 @@ void Game::RenderLevelEditor() {
     m_levelEditor.Render();
 }
 
-void Game::RenderOptions() {}
+void Game::RenderOptions() {
+    HDC hdc = GetDC(m_hwnd);
+    HDC hdcBuffer = CreateCompatibleDC(hdc);
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    RECT clientRect;
+    GetClientRect(m_hwnd, &clientRect);
+    HBITMAP hbmBuffer = CreateCompatibleBitmap(hdc, clientRect.right, clientRect.bottom);
+    HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
+
+    SelectObject(hdcMem, m_backgroundMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCPAINT);
+    SelectObject(hdcMem, m_backgroundMaskMainMenu);
+    BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
+
+    buttonOptionsMusic.Render(hdcBuffer);
+    buttonOptionsSoundEffects.Render(hdcBuffer);
+    buttonBack.Render(hdcBuffer);
+
+    BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcBuffer, 0, 0, SRCCOPY);
+
+    DeleteDC(hdcMem);
+    DeleteObject(hbmBuffer);
+    SelectObject(hdcBuffer, hbmOldBuffer);
+    DeleteObject(hbmOldBuffer);
+    DeleteDC(hdcBuffer);
+    ReleaseDC(m_hwnd, hdc);
+}
 
 void Game::RenderInGame() {
     HDC hdc = GetDC(m_hwnd);
@@ -842,9 +957,8 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
         case GameState::PLAY_MENU:
             if(buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y)) {
-                //m_state = GameState::GAME_LEVELS;
-                m_state = GameState::IN_GAME;
-                LoadLevel(m_currentLevel);
+                m_state = GameState::GAME_LEVELS;
+                m_currentLevel = 1;
             } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::CUSTOM_LEVELS;
             } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
@@ -853,6 +967,16 @@ void Game::ProcessMouseClick(POINT mousePos) {
             break;
 
         case GameState::GAME_LEVELS:
+            if(buttonGameLevelsNext.IsMouseOver(mousePos.x, mousePos.y)) {
+                if(m_currentLevel < 5) ++m_currentLevel;
+            } else if(buttonGameLevelsPrevious.IsMouseOver(mousePos.x, mousePos.y)) {
+                if(m_currentLevel > 1) --m_currentLevel;
+            } else if(buttonGameLevelsPlay.IsMouseOver(mousePos.x, mousePos.y)) {
+                LoadLevel(m_currentLevel);
+                m_state = GameState::IN_GAME;
+            } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_state = GameState::PLAY_MENU;
+            }
             break;
 
         case GameState::CUSTOM_LEVELS:
@@ -867,8 +991,29 @@ void Game::ProcessMouseClick(POINT mousePos) {
             }
             break;
 
-        case GameState::LEVEL_EDITOR:
         case GameState::OPTIONS:
+            if(buttonOptionsMusic.IsMouseOver(mousePos.x, mousePos.y)) {
+                musicEnabled = !musicEnabled;
+
+                if(musicEnabled) {
+                    buttonOptionsMusic.SetText(L"MUSIC: ON");
+                } else {
+                    buttonOptionsMusic.SetText(L"MUSIC: OFF");
+                }
+            } else if(buttonOptionsSoundEffects.IsMouseOver(mousePos.x, mousePos.y)) {
+                soundEffectsEnabled = !soundEffectsEnabled;
+
+                if(soundEffectsEnabled) {
+                    buttonOptionsSoundEffects.SetText(L"SOUND EFFECTS: ON");
+                } else {
+                    buttonOptionsSoundEffects.SetText(L"SOUND EFFECTS: OFF");
+                }
+            } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
+                m_state = GameState::MAIN_MENU;
+            }
+            break;
+
+        case GameState::LEVEL_EDITOR:
         case GameState::IN_GAME:
             break;
 
