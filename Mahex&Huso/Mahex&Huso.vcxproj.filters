@@ -39,6 +39,9 @@
     <ClCompile Include="Tiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\Game.hpp">
@@ -71,13 +74,111 @@
     <ClInclude Include="Label.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\SoundManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\images\background_mainmenu.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\background_mask_mainmenu.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\background_mask_pausemenu.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\background_pausemenu.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\coin.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\coin_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\door_huso.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\door_huso_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\door_mahex.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\door_mahex_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\horizontal_plate.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\horizontal_plate_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\keydown.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\keydown_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\player.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\player_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\pressure.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\pressure_active.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\pressure_active_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\pressure_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\spikes.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\spikes_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
     <Image Include="assets\images\tile.bmp">
       <Filter>assets\images</Filter>
     </Image>
     <Image Include="assets\images\tile_mask.bmp">
       <Filter>assets\images</Filter>
     </Image>
+    <Image Include="assets\images\vertical_plate.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\vertical_plate_mask.bmp">
+      <Filter>assets\images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\sounds\background.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\click.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\coin.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\gameover.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\gamestart.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\gamewin.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\jump.wav">
+      <Filter>assets\sounds</Filter>
+    </Media>
   </ItemGroup>
 </Project>

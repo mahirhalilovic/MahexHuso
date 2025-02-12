@@ -13,6 +13,7 @@
 #include "Display.hpp"
 #include "Button.hpp"
 #include "Label.hpp"
+#include "SoundManager.hpp"
 
 using json = nlohmann::json;
 
@@ -34,6 +35,7 @@ using json = nlohmann::json;
 class Game {
 	public:
 		Game(HWND);
+		~Game();
 		void Update();
 		void Render();
 
@@ -61,7 +63,12 @@ class Game {
 		unsigned int m_coins, m_score;
 		std::set<int> m_activePressureBlocks;
 
+		std::vector<bool> m_finishedLevels;
+		std::vector<int> m_finishedLevelsScores;
+		int m_numOfFinishedLevels;
+
 		LevelEditor m_levelEditor;
+		SoundManager m_soundManager;
 		Display m_display;
 
 		Player Mahex, Huso;
@@ -83,11 +90,11 @@ class Game {
 		float m_gameOverTargetY = 0.0f;
 		bool m_animationInProgressGameOver = false;
 
-		bool musicEnabled = true, soundEffectsEnabled = true;
+		bool musicEnabled, soundEffectsEnabled;
 		bool customLevelPlaying = false;
 
 		Label m_label;
-		Label labelGameLevelsScore;
+		Label labelGameLevelsScore, labelGameLevelsLevel;
 		Label labelGameWinScore, labelGameWinHighScore;
 		Label labelGameOver;
 		Label labelOptionsMusic, labelOptionsSoundEffects;
@@ -112,6 +119,9 @@ class Game {
 
 		void ConstructButtons();
 		void CheckHoverStatus(const POINT &mousePos);
+		void ConstructLabels();
+		void LoadBitmaps();
+		void LoadSounds();
 
 		void RenderMainMenu();
 		void RenderPlayMenu();
@@ -136,6 +146,9 @@ class Game {
 		void LoadLevel(int);
 		bool LoadLevelFromJSON(std::string, int);
 		Tile LoadTile(const json&);
+
+		bool LoadSettings();
+		void SaveSettings();
 
 		void UpdateWindowSize(bool isEditor);
 

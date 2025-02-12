@@ -131,6 +131,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="LevelEditor.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Tiles.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,12 +143,46 @@
     <ClInclude Include="headers\LevelEditor.hpp" />
     <ClInclude Include="headers\Object.hpp" />
     <ClInclude Include="headers\Player.hpp" />
+    <ClInclude Include="headers\SoundManager.hpp" />
     <ClInclude Include="headers\Tiles.hpp" />
     <ClInclude Include="Label.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\images\background_mainmenu.bmp" />
+    <Image Include="assets\images\background_mask_mainmenu.bmp" />
+    <Image Include="assets\images\background_mask_pausemenu.bmp" />
+    <Image Include="assets\images\background_pausemenu.bmp" />
+    <Image Include="assets\images\coin.bmp" />
+    <Image Include="assets\images\coin_mask.bmp" />
+    <Image Include="assets\images\door_huso.bmp" />
+    <Image Include="assets\images\door_huso_mask.bmp" />
+    <Image Include="assets\images\door_mahex.bmp" />
+    <Image Include="assets\images\door_mahex_mask.bmp" />
+    <Image Include="assets\images\horizontal_plate.bmp" />
+    <Image Include="assets\images\horizontal_plate_mask.bmp" />
+    <Image Include="assets\images\keydown.bmp" />
+    <Image Include="assets\images\keydown_mask.bmp" />
+    <Image Include="assets\images\player.bmp" />
+    <Image Include="assets\images\player_mask.bmp" />
+    <Image Include="assets\images\pressure.bmp" />
+    <Image Include="assets\images\pressure_active.bmp" />
+    <Image Include="assets\images\pressure_active_mask.bmp" />
+    <Image Include="assets\images\pressure_mask.bmp" />
+    <Image Include="assets\images\spikes.bmp" />
+    <Image Include="assets\images\spikes_mask.bmp" />
     <Image Include="assets\images\tile.bmp" />
     <Image Include="assets\images\tile_mask.bmp" />
+    <Image Include="assets\images\vertical_plate.bmp" />
+    <Image Include="assets\images\vertical_plate_mask.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\sounds\background.wav" />
+    <Media Include="assets\sounds\click.wav" />
+    <Media Include="assets\sounds\coin.wav" />
+    <Media Include="assets\sounds\gameover.wav" />
+    <Media Include="assets\sounds\gamestart.wav" />
+    <Media Include="assets\sounds\gamewin.wav" />
+    <Media Include="assets\sounds\jump.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

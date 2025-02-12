@@ -2,36 +2,6 @@
 #pragma comment(lib, "Msimg32.lib")
 
 Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
-    m_backgroundMainMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mainmenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_backgroundMaskMainMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_mainmenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_backgroundPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_backgroundMaskPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-    m_bitmapLevelOne = (HBITMAP) LoadImage(NULL, L"assets/level_images/level1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_bitmapLevelTwo = (HBITMAP) LoadImage(NULL, L"assets/level_images/level2.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_bitmapLevelThree = (HBITMAP) LoadImage(NULL, L"assets/level_images/level3.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_bitmapLevelFour = (HBITMAP) LoadImage(NULL, L"assets/level_images/level4.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    m_bitmapLevelFive = (HBITMAP) LoadImage(NULL, L"assets/level_images/level5.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-    m_label = Label(350, 50, 500, 100, L"MAHEX&&HUSO");
-    m_label.SetFont(L"i pixel u", 72, false);
-
-    labelGameLevelsScore = Label(500, 50, 200, 50, L"SCORE: 0");
-    labelGameLevelsScore.SetFont(L"i pixel u", 24, false);
-
-    labelGameWinScore = Label(0, 0, 200, 40, L"");
-    labelGameWinHighScore = Label(0, 0, 200, 40, L"");
-    labelGameWinScore.SetFont(L"i pixel u", 24, false);
-    labelGameWinHighScore.SetFont(L"i pixel u", 24, false);
-
-    labelGameOver = Label(0, 0, 200, 50, L"GAME OVER!!");
-    labelGameOver.SetFont(L"i pixel u", 24, false);
-
-    labelOptionsMusic = Label(350, 285, 300, 50, L"MUSIC: ON");
-    labelOptionsSoundEffects = Label(350, 385, 300, 50, L"SOUND EFFECTS: ON");
-    labelOptionsMusic.SetFont(L"i pixel u", 24, false);
-    labelOptionsSoundEffects.SetFont(L"i pixel u", 24, false);
-
     Mahex = Player{0, 0,
                    (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
@@ -47,11 +17,24 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     m_currentWorkingDirectory = converter.to_bytes(buffer);
 
     m_levels.resize(5);
+    m_finishedLevels.resize(5);
+    m_finishedLevelsScores.resize(5);
 
     m_coins = m_score = 0;
     m_currentLevel = 1;
 
+    if(!LoadSettings()) {
+        MessageBox(m_hwnd, L"Settings could not have been loaded.", L"Error", MB_OK);
+        SendMessage(m_hwnd, WM_CLOSE, 0, 0);
+    }
     ConstructButtons();
+    ConstructLabels();
+    LoadBitmaps();
+    LoadSounds();
+}
+
+Game::~Game() {
+    SaveSettings();
 }
 
 void Game::ConstructButtons() {
@@ -107,6 +90,9 @@ void Game::ConstructButtons() {
     buttonOptionsSoundEffects = Button(450, 385, 300, 50, L"SOUND EFFECTS: ON");
     buttonOptionsMusic.SetFont(L"i pixel u", 26, false);
     buttonOptionsSoundEffects.SetFont(L"i pixel u", 26, false);
+
+    if(!musicEnabled) buttonOptionsMusic.SetText(L"MUSIC: OFF");
+    if(!soundEffectsEnabled) buttonOptionsSoundEffects.SetText(L"SOUND EFFECTS: OFF");
 }
 
 void Game::CheckHoverStatus(const POINT &mousePos) {
@@ -174,6 +160,47 @@ void Game::CheckHoverStatus(const POINT &mousePos) {
     buttonOptionsSoundEffects.hovered = buttonOptionsSoundEffects.IsMouseOver(mousePos.x, mousePos.y);
 }
 
+void Game::ConstructLabels() {
+    m_label = Label(350, 50, 500, 100, L"MAHEX&&HUSO");
+    m_label.SetFont(L"i pixel u", 72, false);
+
+    labelGameLevelsLevel = Label(300, 50, 600, 32, L"");
+    labelGameLevelsScore = Label(300, 85, 600, 32, L"");
+    labelGameLevelsLevel.SetFont(L"i pixel u", 28, false);
+    labelGameLevelsScore.SetFont(L"i pixel u", 28, false);
+
+    labelGameWinScore = Label(0, 0, 200, 40, L"");
+    labelGameWinHighScore = Label(0, 0, 200, 40, L"");
+    labelGameWinScore.SetFont(L"i pixel u", 24, false);
+    labelGameWinHighScore.SetFont(L"i pixel u", 24, false);
+
+    labelGameOver = Label(0, 0, 200, 50, L"GAME OVER!!");
+    labelGameOver.SetFont(L"i pixel u", 24, false);
+}
+
+void Game::LoadBitmaps() {
+    m_backgroundMainMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mainmenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_backgroundMaskMainMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_mainmenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_backgroundPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_backgroundMaskPauseMenu = (HBITMAP) LoadImage(NULL, L"assets/images/background_mask_pausemenu.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
+    m_bitmapLevelOne = (HBITMAP) LoadImage(NULL, L"assets/level_images/level1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelTwo = (HBITMAP) LoadImage(NULL, L"assets/level_images/level2.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelThree = (HBITMAP) LoadImage(NULL, L"assets/level_images/level3.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelFour = (HBITMAP) LoadImage(NULL, L"assets/level_images/level4.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    m_bitmapLevelFive = (HBITMAP) LoadImage(NULL, L"assets/level_images/level5.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+}
+
+void Game::LoadSounds() {
+    m_soundManager.PreloadSound("background", L"assets/sounds/background.wav");
+    m_soundManager.PreloadSound("click", L"assets/sounds/click.wav");
+    m_soundManager.PreloadSound("coin", L"assets/sounds/coin.wav");
+    m_soundManager.PreloadSound("gameover", L"assets/sounds/gameover.wav");
+    m_soundManager.PreloadSound("gamestart", L"assets/sounds/gamestart.wav");
+    m_soundManager.PreloadSound("gamewin", L"assets/sounds/gamewin.wav");
+    m_soundManager.PreloadSound("jump", L"assets/sounds/jump.wav");
+}
+
 void Game::Update() {
     CheckInput();
 
@@ -222,6 +249,7 @@ void Game::UpdatePlayer(Player &player) {
             switch(tile.m_type) {
                 case TileType::SPIKES:
                     m_state = GameState::GAME_OVER;
+                    m_soundManager.PlayCustomSound("gameover");
                     return;
                 case TileType::KEYDOWN_PLATE:
                 case TileType::PRESSURE_PLATE_START:
@@ -245,7 +273,8 @@ void Game::UpdatePlayer(Player &player) {
                 case TileType::COIN:
                     if(tile.m_active) continue;
                     tile.m_active = true;
-                    ++m_coins;
+                    m_soundManager.PlayCustomSound("coin");
+                    m_score += 10;
                     continue;
             }
 
@@ -461,7 +490,10 @@ void Game::RenderGameLevels() {
     SelectObject(hdcMem, m_backgroundMaskMainMenu);
     BitBlt(hdcBuffer, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdcMem, 0, 0, SRCAND);
 
-    Rectangle(hdcBuffer, 299, 179, 901, 541);
+    HPEN pen = CreatePen(PS_SOLID, 3, 0xb3922d);
+    SelectObject(hdcBuffer, pen);
+    Rectangle(hdcBuffer, 298, 178, 902, 542);
+    DeleteObject(pen);
 
     switch(m_currentLevel) {
         case 1:
@@ -483,6 +515,7 @@ void Game::RenderGameLevels() {
 
     BitBlt(hdcBuffer, 300, 180, 600, 360, hdcMem, 0, 0, SRCCOPY);
 
+    labelGameLevelsLevel.Render(hdcBuffer);
     labelGameLevelsScore.Render(hdcBuffer);
 
     buttonGameLevelsNext.Render(hdcBuffer);
@@ -679,10 +712,9 @@ void Game::RenderGameWin() {
     SelectObject(hdc, GetStockObject(NULL_BRUSH));
     Rectangle(hdc, rectX, (int) m_gameWinMenuY, rectX + rectWidth, (int) m_gameWinMenuY + rectHeight);
 
-    std::wstring str = L"SCORE: " + std::to_wstring(m_coins);
+    std::wstring str = L"SCORE: " + std::to_wstring(m_score);
 
     labelGameWinScore.SetText(str);
-    labelGameWinHighScore.SetText(L"NEW HIGH SCORE!");
 
     labelGameWinScore.SetPos(rectX + 50, m_gameWinMenuY + 20);
     labelGameWinHighScore.SetPos(rectX + 50, m_gameWinMenuY + 60);
@@ -938,7 +970,9 @@ void Game::CheckInput() {
 
     if(IsKeyPressed(VK_LBUTTON)) {
         if(!m_mouseButtonPressed) {
+            if(m_soundManager.IsSoundPlaying("gamewin") || m_soundManager.IsSoundPlaying("gameover")) return;
             m_mouseButtonPressed = true;
+            m_soundManager.PlayCustomSound("click");
             ProcessMouseClick(mousePos);
         }
     } else {
@@ -954,6 +988,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
             } else if(buttonMainMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::OPTIONS;
             } else if(buttonMainMenuExit.IsMouseOver(mousePos.x, mousePos.y)) {
+                SaveSettings();
                 SendMessage(m_hwnd, WM_CLOSE, 0, 0);
             }
             break;
@@ -962,6 +997,17 @@ void Game::ProcessMouseClick(POINT mousePos) {
             if(buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::GAME_LEVELS;
                 m_currentLevel = 1;
+
+                std::wstring level = L"LEVEL: " + std::to_wstring(m_currentLevel);
+                labelGameLevelsLevel.SetText(level);
+
+                if(m_finishedLevels[m_currentLevel - 1]) {
+                    std::wstring str = L"SCORE: ";
+                    str += std::to_wstring(m_finishedLevelsScores[m_currentLevel - 1]);
+                    labelGameLevelsScore.SetText(str);
+                } else {
+                    labelGameLevelsScore.SetText(L"YOU HAVE NOT FINISHED THIS LEVEL YET!");
+                }
             } else if(buttonPlayMenuCustomLevels.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::CUSTOM_LEVELS;
             } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
@@ -971,12 +1017,35 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
         case GameState::GAME_LEVELS:
             if(buttonGameLevelsNext.IsMouseOver(mousePos.x, mousePos.y)) {
-                if(m_currentLevel < 5) ++m_currentLevel;
+                if(m_currentLevel < 5 && m_currentLevel < (m_numOfFinishedLevels + 1)) ++m_currentLevel;
+
+                std::wstring level = L"LEVEL: " + std::to_wstring(m_currentLevel);
+                labelGameLevelsLevel.SetText(level);
+
+                if(m_finishedLevels[m_currentLevel - 1]) {
+                    std::wstring score = L"SCORE: " + std::to_wstring(m_finishedLevelsScores[m_currentLevel - 1]);
+                    labelGameLevelsScore.SetText(score);
+                } else {
+                    labelGameLevelsScore.SetText(L"YOU HAVE NOT FINISHED THIS LEVEL YET!");
+                }
             } else if(buttonGameLevelsPrevious.IsMouseOver(mousePos.x, mousePos.y)) {
                 if(m_currentLevel > 1) --m_currentLevel;
+
+                std::wstring level = L"LEVEL: " + std::to_wstring(m_currentLevel);
+                labelGameLevelsLevel.SetText(level);
+
+                if(m_finishedLevels[m_currentLevel - 1]) {
+                    std::wstring score = L"SCORE: " + std::to_wstring(m_finishedLevelsScores[m_currentLevel - 1]);
+                    labelGameLevelsScore.SetText(score);
+                } else {
+                    labelGameLevelsScore.SetText(L"YOU HAVE NOT FINISHED THIS LEVEL YET!");
+                }
             } else if(buttonGameLevelsPlay.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
+                m_soundManager.StopBackgroundMusic();
+                m_soundManager.PlayBackgroundMusic();
+                m_score = 0;
             } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::PLAY_MENU;
             }
@@ -1026,9 +1095,10 @@ void Game::ProcessMouseClick(POINT mousePos) {
             } else if(buttonPauseMenuRestart.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
+                m_soundManager.StopBackgroundMusic();
+                m_soundManager.PlayBackgroundMusic();
             } else if(buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
-                //m_state = GameState::OPTIONS;
-                m_state = GameState::IN_GAME;
+                m_state = GameState::OPTIONS;
             } else if(buttonPauseMenuQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
             }
@@ -1039,9 +1109,13 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 ++m_currentLevel;
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
+                m_soundManager.StopBackgroundMusic();
+                m_soundManager.PlayBackgroundMusic();
             } else if(buttonGameWinRestart.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
+                m_soundManager.StopBackgroundMusic();
+                m_soundManager.PlayBackgroundMusic();
             } else if(buttonGameWinQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
             }
@@ -1051,6 +1125,8 @@ void Game::ProcessMouseClick(POINT mousePos) {
             if(buttonGameOverRestart.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
+                m_soundManager.StopBackgroundMusic();
+                m_soundManager.PlayBackgroundMusic();
             } else if(buttonGameOverQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
             }
@@ -1099,6 +1175,19 @@ void Game::CheckWinningCondition() {
 
     if(mahexEnd && husoEnd) {
         m_state = GameState::GAME_WIN;
+
+        m_soundManager.PlayCustomSound("gamewin");
+
+        m_finishedLevels[m_currentLevel - 1] = true;
+        ++m_numOfFinishedLevels;
+        if(m_score > m_finishedLevelsScores[m_currentLevel - 1]) {
+            m_finishedLevelsScores[m_currentLevel - 1] = m_score;
+
+            labelGameWinHighScore.SetText(L"NEW HIGH SCORE!");
+        } else {
+            std::wstring score = L"HIGH SCORE: " + std::to_wstring(m_finishedLevelsScores[m_currentLevel - 1]);
+            labelGameWinHighScore.SetText(score);
+        }
     }
 }
 
@@ -1175,6 +1264,67 @@ Tile Game::LoadTile(const json &tileData) {
     return newTile;
 }
 
+bool Game::LoadSettings() {
+    try {
+        std::string path = m_currentWorkingDirectory + "/settings.json";
+        std::ifstream file(path);
+        if(!file.is_open()) {
+            return false;
+        }
+
+        json settings;
+        file >> settings;
+        file.close();
+
+        json levelData = settings["levels"];
+
+        for(int i = 1; i <= 5; ++i) {
+            std::string key = "level" + std::to_string(i);
+
+            m_finishedLevels[i - 1] = settings["levels"][key]["finished"];
+            m_finishedLevelsScores[i - 1] = settings["levels"][key]["highscore"];
+
+            if(m_finishedLevels[i - 1]) ++m_numOfFinishedLevels;
+        }
+
+        musicEnabled = settings["music"];
+        soundEffectsEnabled = settings["soundEffects"];
+
+        return true;
+
+    } catch(const std::exception& e) {
+        MessageBoxA(NULL, e.what(), "Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+}
+
+void Game::SaveSettings() {
+    try {
+        json data;
+        data["levels"] = json::object();
+
+        for(int i = 1; i <= 5; ++i) {
+            json levelData = {
+                {"finished", m_finishedLevels[i - 1]},
+                {"highscore", m_finishedLevelsScores[i - 1]}
+            };
+
+            std::string levelKey = "level" + std::to_string(i);
+            data["levels"][levelKey] = levelData;
+        }
+
+        data["music"] = musicEnabled;
+        data["soundEffects"] = soundEffectsEnabled;
+
+        std::string path = m_currentWorkingDirectory + "/settings.json";
+        std::ofstream file(path);
+        file << data.dump(4);
+        file.close();
+    } catch(const std::exception& e) {
+        MessageBoxA(m_hwnd, e.what(), "Error", MB_OK | MB_ICONERROR);
+    }
+}
+
 void Game::UpdateWindowSize(bool isEditor) {
     RECT windowRect;
     GetWindowRect(m_hwnd, &windowRect);
@@ -1182,13 +1332,11 @@ void Game::UpdateWindowSize(bool isEditor) {
     int currentY = windowRect.top;
 
     if(isEditor) {
-        // Move left by 200 and increase width by 400 for editor
         SetWindowPos(m_hwnd, NULL,
             currentX - 200, currentY,
             WINDOW_WIDTH_EDITOR + 16, WINDOW_HEIGHT + 39,
             SWP_NOZORDER);
     } else {
-        // Restore original position and size
         SetWindowPos(m_hwnd, NULL,
             currentX + 200, currentY,
             WINDOW_WIDTH + 16, WINDOW_HEIGHT + 39,
