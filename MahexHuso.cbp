@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="MahexHuso" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/MahexHuso" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/MahexHuso" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add library="gdi32" />
+			<Add library="user32" />
+			<Add library="kernel32" />
+			<Add library="comctl32" />
+		</Linker>
+		<Unit filename="Game.cpp" />
+		<Unit filename="Level.cpp" />
+		<Unit filename="LevelEditor.cpp" />
+		<Unit filename="SoundManager.cpp" />
+		<Unit filename="Tiles.cpp" />
+		<Unit filename="assets/images/background_mainmenu.bmp" />
+		<Unit filename="assets/images/background_mask_mainmenu.bmp" />
+		<Unit filename="assets/images/background_mask_pausemenu.bmp" />
+		<Unit filename="assets/images/background_pausemenu.bmp" />
+		<Unit filename="assets/images/coin.bmp" />
+		<Unit filename="assets/images/coin_mask.bmp" />
+		<Unit filename="assets/images/door_huso.bmp" />
+		<Unit filename="assets/images/door_huso_mask.bmp" />
+		<Unit filename="assets/images/door_mahex.bmp" />
+		<Unit filename="assets/images/door_mahex_mask.bmp" />
+		<Unit filename="assets/images/horizontal_plate.bmp" />
+		<Unit filename="assets/images/horizontal_plate_mask.bmp" />
+		<Unit filename="assets/images/huso.bmp" />
+		<Unit filename="assets/images/huso_mask.bmp" />
+		<Unit filename="assets/images/keydown.bmp" />
+		<Unit filename="assets/images/keydown_mask.bmp" />
+		<Unit filename="assets/images/mahex.bmp" />
+		<Unit filename="assets/images/mahex_mask.bmp" />
+		<Unit filename="assets/images/player.bmp" />
+		<Unit filename="assets/images/player_mask.bmp" />
+		<Unit filename="assets/images/pressure.bmp" />
+		<Unit filename="assets/images/pressure_active.bmp" />
+		<Unit filename="assets/images/pressure_active_mask.bmp" />
+		<Unit filename="assets/images/pressure_mask.bmp" />
+		<Unit filename="assets/images/spikes.bmp" />
+		<Unit filename="assets/images/spikes_mask.bmp" />
+		<Unit filename="assets/images/tile.bmp" />
+		<Unit filename="assets/images/tile_mask.bmp" />
+		<Unit filename="assets/images/vertical_plate.bmp" />
+		<Unit filename="assets/images/vertical_plate_mask.bmp" />
+		<Unit filename="assets/level_images/level1.bmp" />
+		<Unit filename="assets/level_images/level2.bmp" />
+		<Unit filename="assets/level_images/level3.bmp" />
+		<Unit filename="assets/level_images/level4.bmp" />
+		<Unit filename="assets/level_images/level5.bmp" />
+		<Unit filename="assets/sounds/background.wav" />
+		<Unit filename="assets/sounds/click.wav" />
+		<Unit filename="assets/sounds/coin.wav" />
+		<Unit filename="assets/sounds/gameover.wav" />
+		<Unit filename="assets/sounds/gamestart.wav" />
+		<Unit filename="assets/sounds/gamewin.wav" />
+		<Unit filename="assets/sounds/jump.wav" />
+		<Unit filename="headers/Button.hpp" />
+		<Unit filename="headers/Game.hpp" />
+		<Unit filename="headers/Label.hpp" />
+		<Unit filename="headers/Level.hpp" />
+		<Unit filename="headers/LevelEditor.hpp" />
+		<Unit filename="headers/Object.hpp" />
+		<Unit filename="headers/Player.hpp" />
+		<Unit filename="headers/SoundManager.hpp" />
+		<Unit filename="headers/Tiles.hpp" />
+		<Unit filename="headers/json.hpp" />
+		<Unit filename="levels/level1.json" />
+		<Unit filename="levels/level2.json" />
+		<Unit filename="levels/level3.json" />
+		<Unit filename="levels/level4.json" />
+		<Unit filename="levels/level5.json" />
+		<Unit filename="main.cpp" />
+		<Unit filename="settings.json" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
