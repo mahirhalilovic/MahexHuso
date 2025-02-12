@@ -137,7 +137,7 @@
             "y": 240
         },
         {
-            "id": 4,
+            "id": 1,
             "orientation": "VERTICAL",
             "type": "KEYDOWN_PLATE",
             "x": 96,
@@ -149,7 +149,12 @@
             "y": 336
         },
         {
-            "id": 1,
+            "type": "COIN",
+            "x": 96,
+            "y": 480
+        },
+        {
+            "id": 2,
             "type": "PRESSURE_BLOCK",
             "x": 96,
             "y": 576
@@ -205,14 +210,9 @@
             "y": 96
         },
         {
-            "type": "TILE",
+            "type": "SPIKES",
             "x": 192,
             "y": 576
-        },
-        {
-            "type": "MAHEX_START",
-            "x": 192,
-            "y": 624
         },
         {
             "type": "TILE",
@@ -247,7 +247,7 @@
             "y": 432
         },
         {
-            "type": "SPIKES",
+            "type": "TILE",
             "x": 240,
             "y": 576
         },
@@ -367,12 +367,22 @@
             "y": 0
         },
         {
+            "type": "COIN",
+            "x": 480,
+            "y": 96
+        },
+        {
             "type": "TILE",
             "x": 480,
             "y": 192
         },
         {
-            "id": 2,
+            "type": "COIN",
+            "x": 480,
+            "y": 336
+        },
+        {
+            "id": 0,
             "orientation": "HORIZONTAL",
             "type": "KEYDOWN_PLATE",
             "x": 480,
@@ -387,11 +397,6 @@
             "type": "TILE",
             "x": 528,
             "y": 0
-        },
-        {
-            "type": "COIN",
-            "x": 528,
-            "y": 144
         },
         {
             "type": "TILE",
@@ -549,7 +554,7 @@
             "y": 384
         },
         {
-            "id": 4,
+            "id": 1,
             "type": "KEYDOWN_BLOCK",
             "x": 672,
             "y": 480
@@ -568,6 +573,11 @@
             "type": "TILE",
             "x": 720,
             "y": 96
+        },
+        {
+            "type": "COIN",
+            "x": 720,
+            "y": 288
         },
         {
             "type": "TILE",
@@ -625,7 +635,7 @@
             "y": 384
         },
         {
-            "id": 2,
+            "id": 0,
             "type": "KEYDOWN_BLOCK",
             "x": 864,
             "y": 672
@@ -664,6 +674,11 @@
             "type": "TILE",
             "x": 960,
             "y": 384
+        },
+        {
+            "type": "MAHEX_START",
+            "x": 960,
+            "y": 624
         },
         {
             "type": "TILE",
@@ -727,7 +742,8 @@
         },
         {
             "endPos": 480,
-            "id": 1,
+            "id": 2,
+            "movement": "VERTICAL",
             "orientation": "HORIZONTAL",
             "startPos": 624,
             "type": "PRESSURE_PLATE_START",

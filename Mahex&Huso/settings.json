@@ -5,20 +5,20 @@
             "highscore": 100
         },
         "level2": {
-            "finished": false,
-            "highscore": 0
+            "finished": true,
+            "highscore": 40
         },
         "level3": {
-            "finished": false,
-            "highscore": 0
+            "finished": true,
+            "highscore": 40
         },
         "level4": {
-            "finished": false,
+            "finished": true,
             "highscore": 0
         },
         "level5": {
-            "finished": false,
-            "highscore": 0
+            "finished": true,
+            "highscore": 60
         }
     },
     "music": true,

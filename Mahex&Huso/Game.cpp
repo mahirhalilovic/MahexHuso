@@ -3,12 +3,12 @@
 
 Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     Mahex = Player{0, 0,
-                   (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                   (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                   (HBITMAP) LoadImage(NULL, L"assets/images/mahex.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                   (HBITMAP) LoadImage(NULL, L"assets/images/mahex_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    0.f, 0.f, true, 0, IDLE};
     Huso = Player{0, 0,
-                   (HBITMAP) LoadImage(NULL, L"assets/images/player.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
-                   (HBITMAP) LoadImage(NULL, L"assets/images/player_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                   (HBITMAP) LoadImage(NULL, L"assets/images/huso.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
+                   (HBITMAP) LoadImage(NULL, L"assets/images/huso_mask.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE),
                    0.f, 0.f, true, 0, IDLE};
 
     wchar_t buffer[MAX_PATH];
@@ -16,7 +16,7 @@ Game::Game(HWND hwnd) : m_hwnd{hwnd}, m_display{Display(hwnd)} {
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     m_currentWorkingDirectory = converter.to_bytes(buffer);
 
-    m_levels.resize(5);
+    m_levels.resize(6);
     m_finishedLevels.resize(5);
     m_finishedLevelsScores.resize(5);
 
@@ -192,16 +192,18 @@ void Game::LoadBitmaps() {
 }
 
 void Game::LoadSounds() {
-    m_soundManager.PreloadSound("background", L"assets/sounds/background.wav");
-    m_soundManager.PreloadSound("click", L"assets/sounds/click.wav");
-    m_soundManager.PreloadSound("coin", L"assets/sounds/coin.wav");
-    m_soundManager.PreloadSound("gameover", L"assets/sounds/gameover.wav");
-    m_soundManager.PreloadSound("gamestart", L"assets/sounds/gamestart.wav");
-    m_soundManager.PreloadSound("gamewin", L"assets/sounds/gamewin.wav");
-    m_soundManager.PreloadSound("jump", L"assets/sounds/jump.wav");
+    m_soundManager.PreloadSound("background", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/background.wav");
+    m_soundManager.PreloadSound("click", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/click.wav");
+    m_soundManager.PreloadSound("coin", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/coin.wav");
+    m_soundManager.PreloadSound("gameover", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/gameover.wav");
+    m_soundManager.PreloadSound("gamestart", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/gamestart.wav");
+    m_soundManager.PreloadSound("gamewin", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/gamewin.wav");
+    m_soundManager.PreloadSound("jump", std::wstring(m_currentWorkingDirectory.begin(), m_currentWorkingDirectory.end()) + L"/assets/sounds/jump.wav");
 }
 
-void Game::Update() {
+void Game::Update(int fpsCount) {
+    if(fpsCount % 5 == 0) UpdateCounters();
+
     CheckInput();
 
     if(m_state == GameState::IN_GAME) {
@@ -222,6 +224,13 @@ void Game::Update() {
     }
 }
 
+void Game::UpdateCounters() {
+    if(m_state == GameState::IN_GAME) {
+        if(Mahex.m_grounded && Mahex.m_direction != Direction::IDLE) Mahex.m_spriteCounter = (Mahex.m_spriteCounter + 1) % 4;
+        if(Huso.m_grounded && Huso.m_direction != Direction::IDLE) Huso.m_spriteCounter = (Huso.m_spriteCounter + 1) % 4;
+    }
+}
+
 void Game::UpdatePlayer(Player &player) {
     if(!player.m_grounded) {
         player.m_velY += 0.5f;
@@ -233,9 +242,9 @@ void Game::UpdatePlayer(Player &player) {
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
 
-    RECT currentRect = {player.m_posX, player.m_posY, player.m_posX + PLAYER_SIZE, player.m_posY + PLAYER_SIZE};
+    RECT currentRect = {player.m_posX, player.m_posY, player.m_posX + PLAYER_WIDTH, player.m_posY + PLAYER_HEIGHT};
     RECT groundCheck = {currentRect.left, currentRect.bottom, currentRect.right, currentRect.bottom + 1};
-    RECT nextRect = {newPosX, newPosY, newPosX + PLAYER_SIZE, newPosY + PLAYER_SIZE};
+    RECT nextRect = {newPosX, newPosY, newPosX + PLAYER_WIDTH, newPosY + PLAYER_HEIGHT};
 
     player.m_grounded = false;
 
@@ -244,17 +253,20 @@ void Game::UpdatePlayer(Player &player) {
         RECT tileCheck = {tile.m_posX, tile.m_posY, tile.m_posX + TILE_SIZE, tile.m_posY + TILE_SIZE};
 
         if(tile.m_type == TileType::KEYDOWN_PLATE && tile.m_active) continue;
+        if(tile.m_type == TileType::MAHEX_END || tile.m_type == TileType::HUSO_END) continue;
+        if(tile.m_type == TileType::COIN && tile.m_active) continue;
 
         if(IntersectRect(&intersection, &groundCheck, &tileCheck)) {
             switch(tile.m_type) {
                 case TileType::SPIKES:
                     m_state = GameState::GAME_OVER;
-                    m_soundManager.PlayCustomSound("gameover");
+                    m_soundManager.StopBackgroundMusic();
+                    if(soundEffectsEnabled) m_soundManager.PlayCustomSound("gameover");
                     return;
                 case TileType::KEYDOWN_PLATE:
                 case TileType::PRESSURE_PLATE_START:
                     if(player.m_velY < 0.1f) continue;
-                    newPosY = tile.m_posY + 16 - PLAYER_SIZE;
+                    newPosY = tile.m_posY + 16 - PLAYER_HEIGHT;
                     player.m_grounded = true;
                     continue;
                 case TileType::PRESSURE_BLOCK:
@@ -266,20 +278,15 @@ void Game::UpdatePlayer(Player &player) {
         }
 
         if(IntersectRect(&intersection, &nextRect, &tileCheck)) {
-            switch(tile.m_type) {
-                case TileType::MAHEX_END:
-                case TileType::HUSO_END:
-                    continue;
-                case TileType::COIN:
-                    if(tile.m_active) continue;
-                    tile.m_active = true;
-                    m_soundManager.PlayCustomSound("coin");
-                    m_score += 10;
-                    continue;
+            if(tile.m_type == TileType::COIN) {
+                tile.m_active = true;
+                if(soundEffectsEnabled) m_soundManager.PlayCustomSound("coin");
+                m_score += 10;
+                continue;
             }
 
-            if(player.m_velY > 0 && currentRect.bottom <= tileCheck.top) {
-                newPosY = tileCheck.top - PLAYER_SIZE;
+            if(player.m_velY > 0 && currentRect.bottom <= tileCheck.top + 2) {
+                newPosY = tileCheck.top - PLAYER_HEIGHT;
                 player.m_velY = 0;
                 player.m_grounded = true;
             } else if(player.m_velY < 0 && currentRect.top >= tileCheck.bottom) {
@@ -290,7 +297,7 @@ void Game::UpdatePlayer(Player &player) {
                 }
                 player.m_velY = 0;
             } else if(player.m_velX > 0 && currentRect.right <= tileCheck.left) {
-                newPosX = tileCheck.left - PLAYER_SIZE;
+                newPosX = tileCheck.left - PLAYER_WIDTH;
                 player.m_velX = 0;
             } else if(player.m_velX < 0 && currentRect.left >= tileCheck.right) {
                 newPosX = tileCheck.right;
@@ -331,8 +338,8 @@ void Game::CheckPressureBlocks() {
                                 plate->m_posY -= 1;
 
                                 RECT intersect;
-                                RECT mahexCheck = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_SIZE, Mahex.m_posY + PLAYER_SIZE + 1};
-                                RECT husoCheck = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_SIZE, Huso.m_posY + PLAYER_SIZE + 1};
+                                RECT mahexCheck = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_WIDTH, Mahex.m_posY + PLAYER_HEIGHT + 1};
+                                RECT husoCheck = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_WIDTH, Huso.m_posY + PLAYER_HEIGHT + 1};
                                 RECT tileCheck = {plate->m_posX, plate->m_posY, plate->m_posX + TILE_SIZE, plate->m_posY + TILE_SIZE};
                                 if(IntersectRect(&intersect, &mahexCheck, &tileCheck)) {
                                     Mahex.m_posY -= 1;
@@ -611,14 +618,14 @@ void Game::RenderInGame() {
 
     // Player
     SelectObject(hdcMem, Mahex.m_mask);
-    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCPAINT);
+    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_WIDTH, PLAYER_HEIGHT, hdcMem, Mahex.m_spriteCounter * PLAYER_WIDTH, (int) Mahex.m_direction * PLAYER_HEIGHT, SRCPAINT);
     SelectObject(hdcMem, Mahex.m_bitmap);
-    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCAND);
+    BitBlt(hdcBuffer, Mahex.m_posX, Mahex.m_posY, PLAYER_WIDTH, PLAYER_HEIGHT, hdcMem, Mahex.m_spriteCounter * PLAYER_WIDTH, (int) Mahex.m_direction * PLAYER_HEIGHT, SRCAND);
 
     SelectObject(hdcMem, Huso.m_mask);
-    BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCPAINT);
+    BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_WIDTH, PLAYER_HEIGHT, hdcMem, Huso.m_spriteCounter * PLAYER_WIDTH, (int) Huso.m_direction * PLAYER_HEIGHT, SRCPAINT);
     SelectObject(hdcMem, Huso.m_bitmap);
-    BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_SIZE, PLAYER_SIZE, hdcMem, 0, 0, SRCAND);
+    BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_WIDTH, PLAYER_HEIGHT, hdcMem, Huso.m_spriteCounter * PLAYER_WIDTH, (int) Huso.m_direction * PLAYER_HEIGHT, SRCAND);
 
     BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, hdcBuffer, 0, 0, SRCCOPY);
 
@@ -882,69 +889,73 @@ void Game::CheckInput() {
 
     CheckHoverStatus(mousePos);
 
-    if(IsKeyPressed(VK_LEFT)) {
-        Mahex.m_direction = DIRECTION_LEFT;
-        Mahex.m_velX = -MOVE_SPEED;
-    } else if(IsKeyPressed(VK_RIGHT)) {
-        Mahex.m_direction = DIRECTION_RIGHT;
-        Mahex.m_velX = MOVE_SPEED;
-    } else {
-        Mahex.m_direction = IDLE;
-        Mahex.m_velX = 0;
-    }
-    if(IsKeyPressed(VK_UP) && Mahex.m_grounded) {
-        Mahex.m_velY = -JUMP_HEIGHT;
-        Mahex.m_grounded = false;
-    }
-    if(IsKeyPressed(VK_DOWN)) {
-        int tileX = Mahex.m_posX / TILE_SIZE;
-        int tileY = (Mahex.m_posY + PLAYER_SIZE) / TILE_SIZE;
+    if(m_state == GameState::IN_GAME) {
+        if(IsKeyPressed(VK_LEFT)) {
+            Mahex.m_direction = DIRECTION_LEFT;
+            Mahex.m_velX = -MOVE_SPEED;
+        } else if(IsKeyPressed(VK_RIGHT)) {
+            Mahex.m_direction = DIRECTION_RIGHT;
+            Mahex.m_velX = MOVE_SPEED;
+        } else {
+            Mahex.m_direction = IDLE;
+            Mahex.m_velX = 0;
+        }
+        if(IsKeyPressed(VK_UP) && Mahex.m_grounded) {
+            Mahex.m_velY = -JUMP_HEIGHT;
+            Mahex.m_grounded = false;
+            if(soundEffectsEnabled) m_soundManager.PlayCustomSound("jump");
+        }
+        if(IsKeyPressed(VK_DOWN)) {
+            int tileX = (Mahex.m_posX + 16) / TILE_SIZE;
+            int tileY = (Mahex.m_posY + PLAYER_HEIGHT) / TILE_SIZE;
 
-        for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
-            int currentTileX = tile.m_posX / TILE_SIZE;
-            int currentTileY = tile.m_posY / TILE_SIZE;
+            for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+                int currentTileX = tile.m_posX / TILE_SIZE;
+                int currentTileY = tile.m_posY / TILE_SIZE;
 
-            if(currentTileX == tileX && currentTileY == tileY) {
-                if(tile.m_type == TileType::KEYDOWN_BLOCK) {
-                    for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
-                        if(plate.m_id == tile.m_id)
-                            plate.m_active = true;
+                if(currentTileX == tileX && currentTileY == tileY) {
+                    if(tile.m_type == TileType::KEYDOWN_BLOCK) {
+                        for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
+                            if(plate.m_id == tile.m_id)
+                                plate.m_active = true;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
-    }
 
-    if(IsKeyPressed('A')) {
-        Huso.m_direction = DIRECTION_LEFT;
-        Huso.m_velX = -MOVE_SPEED;
-    } else if(IsKeyPressed('D')) {
-        Huso.m_direction = DIRECTION_RIGHT;
-        Huso.m_velX = MOVE_SPEED;
-    } else {
-        Huso.m_direction = IDLE;
-        Huso.m_velX = 0;
-    }
-    if(IsKeyPressed('W') && Huso.m_grounded) {
-        Huso.m_velY = -JUMP_HEIGHT;
-        Huso.m_grounded = false;
-    }
-    if(IsKeyPressed('S')) {
-        int tileX = Huso.m_posX / TILE_SIZE;
-        int tileY = (Huso.m_posY + PLAYER_SIZE) / TILE_SIZE;
+        if(IsKeyPressed('A')) {
+            Huso.m_direction = DIRECTION_LEFT;
+            Huso.m_velX = -MOVE_SPEED;
+        } else if(IsKeyPressed('D')) {
+            Huso.m_direction = DIRECTION_RIGHT;
+            Huso.m_velX = MOVE_SPEED;
+        } else {
+            Huso.m_direction = IDLE;
+            Huso.m_velX = 0;
+        }
+        if(IsKeyPressed('W') && Huso.m_grounded) {
+            Huso.m_velY = -JUMP_HEIGHT;
+            Huso.m_grounded = false;
+            if(soundEffectsEnabled) m_soundManager.PlayCustomSound("jump");
+        }
+        if(IsKeyPressed('S')) {
+            int tileX = (Huso.m_posX + 16) / TILE_SIZE;
+            int tileY = (Huso.m_posY + PLAYER_HEIGHT) / TILE_SIZE;
 
-        for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
-            int currentTileX = tile.m_posX / TILE_SIZE;
-            int currentTileY = tile.m_posY / TILE_SIZE;
+            for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
+                int currentTileX = tile.m_posX / TILE_SIZE;
+                int currentTileY = tile.m_posY / TILE_SIZE;
 
-            if(currentTileX == tileX && currentTileY == tileY) {
-                if(tile.m_type == TileType::KEYDOWN_BLOCK) {
-                    for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
-                        if(plate.m_id == tile.m_id)
-                            plate.m_active = true;
+                if(currentTileX == tileX && currentTileY == tileY) {
+                    if(tile.m_type == TileType::KEYDOWN_BLOCK) {
+                        for(Tile &plate : m_levels[m_currentLevel - 1].m_tiles) {
+                            if(plate.m_id == tile.m_id)
+                                plate.m_active = true;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
@@ -964,15 +975,11 @@ void Game::CheckInput() {
         m_escapeButtonPressed = false;
     }
 
-    if(IsKeyPressed('Q')) {
-        SendMessage(m_hwnd, WM_CLOSE, 0, 0);
-    }
-
     if(IsKeyPressed(VK_LBUTTON)) {
         if(!m_mouseButtonPressed) {
             if(m_soundManager.IsSoundPlaying("gamewin") || m_soundManager.IsSoundPlaying("gameover")) return;
             m_mouseButtonPressed = true;
-            m_soundManager.PlayCustomSound("click");
+            if(soundEffectsEnabled) m_soundManager.PlayCustomSound("click");
             ProcessMouseClick(mousePos);
         }
     } else {
@@ -995,6 +1002,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
         case GameState::PLAY_MENU:
             if(buttonPlayMenuGameLevels.IsMouseOver(mousePos.x, mousePos.y)) {
+                if(customLevelPlaying) customLevelPlaying = false;
                 m_state = GameState::GAME_LEVELS;
                 m_currentLevel = 1;
 
@@ -1044,8 +1052,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
-                m_soundManager.PlayBackgroundMusic();
-                m_score = 0;
+                if(musicEnabled) m_soundManager.PlayBackgroundMusic();
             } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::PLAY_MENU;
             }
@@ -1053,7 +1060,10 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
         case GameState::CUSTOM_LEVELS:
             if(buttonCustomLevelsPlay.IsMouseOver(mousePos.x, mousePos.y)) {
-                //
+                m_currentLevel = 6;
+                LoadLevel(m_currentLevel);
+                m_state = GameState::IN_GAME;
+                customLevelPlaying = true;
             } else if(buttonCustomLevelsEdit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::LEVEL_EDITOR;
                 m_levelEditor = LevelEditor(m_hwnd);
@@ -1096,11 +1106,12 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
-                m_soundManager.PlayBackgroundMusic();
+                if(musicEnabled) m_soundManager.PlayBackgroundMusic();
             } else if(buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::OPTIONS;
             } else if(buttonPauseMenuQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
+                if(customLevelPlaying) customLevelPlaying = false;
             }
             break;
 
@@ -1110,14 +1121,15 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
-                m_soundManager.PlayBackgroundMusic();
+                if(musicEnabled) m_soundManager.PlayBackgroundMusic();
             } else if(buttonGameWinRestart.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
-                m_soundManager.PlayBackgroundMusic();
+                if(musicEnabled) m_soundManager.PlayBackgroundMusic();
             } else if(buttonGameWinQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
+                if(customLevelPlaying) customLevelPlaying = false;
             }
             break;
 
@@ -1126,67 +1138,101 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
-                m_soundManager.PlayBackgroundMusic();
+                if(musicEnabled) m_soundManager.PlayBackgroundMusic();
             } else if(buttonGameOverQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
+                if(customLevelPlaying) customLevelPlaying = false;
             }
             break;
     }
 }
 
 void Game::LoadLevel(int newLevel) {
-    std::string path = m_currentWorkingDirectory + "/levels/level";
-    path += std::to_string(newLevel);
-    path += ".json";
+    if(newLevel == 6) {
+        OPENFILENAMEA ofn;
+        char szFile[260] = {0};
 
-    LoadLevelFromJSON(path, newLevel - 1);
+        ZeroMemory(&ofn, sizeof(ofn));
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = m_hwnd;
+        ofn.lpstrFile = szFile;
+        ofn.nMaxFile = sizeof(szFile);
+        ofn.lpstrFilter = "JSON Files\0*.json\0All Files\0*.*\0";
+        ofn.nFilterIndex = 1;
+        ofn.lpstrFileTitle = NULL;
+        ofn.nMaxFileTitle = 0;
+        ofn.lpstrInitialDir = NULL;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    Mahex.m_posX = m_levels[m_currentLevel - 1].m_startMahex.x;
-    Mahex.m_posY = m_levels[m_currentLevel - 1].m_startMahex.y;
-    Mahex.m_velX = 0;
-    Mahex.m_velY = 0;
-    Mahex.m_grounded = false;
+        if(GetOpenFileNameA(&ofn)) {
+            customLevelPath = ofn.lpstrFile;
+        } else {
+            MessageBox(m_hwnd, L"Could not load custom level", L"Error", MB_OK | MB_ICONWARNING);
+        }
 
-    Huso.m_posX = m_levels[m_currentLevel - 1].m_startHuso.x;
-    Huso.m_posY = m_levels[m_currentLevel - 1].m_startHuso.y;
-    Huso.m_velX = 0;
-    Huso.m_velY = 0;
-    Huso.m_grounded = false;
+        if(!LoadLevelFromJSON(customLevelPath, 5)) MessageBox(m_hwnd, L"Could not load level from JSON!", L"Error", MB_OK);
+
+        Mahex.m_posX = m_levels[m_currentLevel - 1].m_startMahex.x;
+        Mahex.m_posY = m_levels[m_currentLevel - 1].m_startMahex.y;
+        Mahex.m_velX = 0;
+        Mahex.m_velY = 0;
+        Mahex.m_grounded = false;
+
+        Huso.m_posX = m_levels[m_currentLevel - 1].m_startHuso.x;
+        Huso.m_posY = m_levels[m_currentLevel - 1].m_startHuso.y;
+        Huso.m_velX = 0;
+        Huso.m_velY = 0;
+        Huso.m_grounded = false;
+    } else {
+        std::string path = m_currentWorkingDirectory + "/levels/level";
+        path += std::to_string(newLevel);
+        path += ".json";
+
+        LoadLevelFromJSON(path, newLevel - 1);
+
+        Mahex.m_posX = m_levels[m_currentLevel - 1].m_startMahex.x;
+        Mahex.m_posY = m_levels[m_currentLevel - 1].m_startMahex.y;
+        Mahex.m_velX = 0;
+        Mahex.m_velY = 0;
+        Mahex.m_grounded = false;
+
+        Huso.m_posX = m_levels[m_currentLevel - 1].m_startHuso.x;
+        Huso.m_posY = m_levels[m_currentLevel - 1].m_startHuso.y;
+        Huso.m_velX = 0;
+        Huso.m_velY = 0;
+        Huso.m_grounded = false;
+    }
+    m_score = 0;
 }
 
 void Game::CheckWinningCondition() {
-    bool mahexEnd = false, husoEnd = false;
+    RECT currentMahexRect = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_WIDTH, Mahex.m_posY + PLAYER_HEIGHT};
+    RECT currentHusoRect = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_WIDTH, Huso.m_posY + PLAYER_HEIGHT};
+    RECT tileMahexEnd = {m_mahexEnd.x + 22, m_mahexEnd.y + 46, m_mahexEnd.x + 26, m_mahexEnd.y + TILE_SIZE};
+    RECT tileHusoEnd = {m_husoEnd.x + 22, m_husoEnd.y + 46, m_husoEnd.x + 26, m_husoEnd.y + TILE_SIZE};
 
-    RECT currentMahexRect = {Mahex.m_posX, Mahex.m_posY, Mahex.m_posX + PLAYER_SIZE, Mahex.m_posY + PLAYER_SIZE};
-    RECT currentHusoRect = {Huso.m_posX, Huso.m_posY, Huso.m_posX + PLAYER_SIZE, Huso.m_posY + PLAYER_SIZE};
-
-    for(Tile& tile : m_levels[m_currentLevel - 1].m_tiles) {
-        RECT intersection;
-        RECT tileCheck = {tile.m_posX + 22, tile.m_posY + 44, tile.m_posX + 26, tile.m_posY + 48};
-        
-        if(tile.m_type == TileType::MAHEX_END) {
-            mahexEnd = IntersectRect(&intersection, &currentMahexRect, &tileCheck);
-        } else if(tile.m_type == TileType::HUSO_END) {
-            husoEnd = IntersectRect(&intersection, &currentHusoRect, &tileCheck);
-        } else {
-            continue;
-        }
-    }
+    RECT intersection, intersection2;
+    bool mahexEnd = IntersectRect(&intersection, &currentMahexRect, &tileMahexEnd);
+    bool husoEnd = IntersectRect(&intersection2, &currentHusoRect, &tileHusoEnd);
 
     if(mahexEnd && husoEnd) {
         m_state = GameState::GAME_WIN;
+        m_soundManager.StopBackgroundMusic();
+        if(soundEffectsEnabled) m_soundManager.PlayCustomSound("gamewin");
 
-        m_soundManager.PlayCustomSound("gamewin");
+        if(m_currentLevel < 6) {
+            m_finishedLevels[m_currentLevel - 1] = true;
+            ++m_numOfFinishedLevels;
+            if(m_score > m_finishedLevelsScores[m_currentLevel - 1]) {
+                m_finishedLevelsScores[m_currentLevel - 1] = m_score;
 
-        m_finishedLevels[m_currentLevel - 1] = true;
-        ++m_numOfFinishedLevels;
-        if(m_score > m_finishedLevelsScores[m_currentLevel - 1]) {
-            m_finishedLevelsScores[m_currentLevel - 1] = m_score;
+                labelGameWinHighScore.SetText(L"NEW HIGH SCORE!");
+            } else {
+                std::wstring score = L"HIGH SCORE: " + std::to_wstring(m_finishedLevelsScores[m_currentLevel - 1]);
+                labelGameWinHighScore.SetText(score);
+            }
 
-            labelGameWinHighScore.SetText(L"NEW HIGH SCORE!");
-        } else {
-            std::wstring score = L"HIGH SCORE: " + std::to_wstring(m_finishedLevelsScores[m_currentLevel - 1]);
-            labelGameWinHighScore.SetText(score);
+            SaveSettings();
         }
     }
 }
@@ -1212,6 +1258,14 @@ bool Game::LoadLevelFromJSON(std::string path, int id) {
             } else if(m_levelEditor.StringToTileType(tileData["type"]) == TileType::HUSO_START) {
                 m_loadedLevel.m_startHuso.x = tileData["x"];
                 m_loadedLevel.m_startHuso.y = tileData["y"];
+            } else if(m_levelEditor.StringToTileType(tileData["type"]) == TileType::MAHEX_END) {
+                m_mahexEnd.x = tileData["x"];
+                m_mahexEnd.y = tileData["y"];
+                m_loadedLevel.m_tiles.push_back(LoadTile(tileData));
+            } else if(m_levelEditor.StringToTileType(tileData["type"]) == TileType::HUSO_END) {
+                m_husoEnd.x = tileData["x"];
+                m_husoEnd.y = tileData["y"];
+                m_loadedLevel.m_tiles.push_back(LoadTile(tileData));
             } else {
                 m_loadedLevel.m_tiles.push_back(LoadTile(tileData));
             }

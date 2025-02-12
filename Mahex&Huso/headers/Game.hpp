@@ -22,7 +22,8 @@ using json = nlohmann::json;
 #define WINDOW_HEIGHT 720
 
 #define TILE_SIZE 48
-#define PLAYER_SIZE 32
+#define PLAYER_HEIGHT 32
+#define PLAYER_WIDTH 32
 #define COIN_SIZE 16
 #define PLATE_WIDTH 16
 #define PLATE_LENGTH 48
@@ -36,7 +37,7 @@ class Game {
 	public:
 		Game(HWND);
 		~Game();
-		void Update();
+		void Update(int);
 		void Render();
 
 	private:
@@ -62,6 +63,7 @@ class Game {
 		int m_currentLevel = 1;
 		unsigned int m_coins, m_score;
 		std::set<int> m_activePressureBlocks;
+		POINT m_mahexEnd, m_husoEnd;
 
 		std::vector<bool> m_finishedLevels;
 		std::vector<int> m_finishedLevelsScores;
@@ -92,6 +94,7 @@ class Game {
 
 		bool musicEnabled, soundEffectsEnabled;
 		bool customLevelPlaying = false;
+		std::string customLevelPath;
 
 		Label m_label;
 		Label labelGameLevelsScore, labelGameLevelsLevel;
@@ -137,6 +140,7 @@ class Game {
 
 		void CheckPressureBlocks();
 
+		void UpdateCounters();
 		void UpdatePlayer(Player&);
 		void CheckInput();
 		void ProcessMouseClick(POINT);

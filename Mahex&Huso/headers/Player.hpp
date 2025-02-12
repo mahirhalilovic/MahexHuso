@@ -4,7 +4,7 @@
 
 #include "Object.hpp"
 
-enum Direction { DIRECTION_LEFT = 1, DIRECTION_RIGHT, IDLE };
+enum Direction { IDLE = 0, DIRECTION_LEFT, DIRECTION_RIGHT };
 
 struct Player : Object {
 	float m_velX;
@@ -12,7 +12,6 @@ struct Player : Object {
 	bool m_grounded;
 
 	int m_spriteCounter;
-
 	Direction m_direction;
 
 	Player() = default;

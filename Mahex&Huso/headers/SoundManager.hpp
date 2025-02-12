@@ -12,6 +12,7 @@
 class SoundManager {
     public:
     SoundManager() = default;
+    SoundManager(HWND);
     ~SoundManager();
     void PreloadSound(const std::string&, const std::wstring&);
     void PlayCustomSound(const std::string&);
@@ -26,6 +27,8 @@ class SoundManager {
     };
     std::map<std::string, std::wstring> m_sounds;
     SoundThread m_threadBackgroundMusic, m_threadGameWin, m_threadGameOver;
+    HWND m_hwnd;
+    std::atomic<bool> m_stopBackgroundMusic = false;
 
     void PlaySoundFile(const std::string&, const std::wstring&);
     void PlaySoundFileLooped(const std::string&, const std::wstring&);

@@ -20,9 +20,9 @@
 // [+] Implement end goals
 // [+] Add obstacles
 // [+] Level restarting
-// [-] Implement score mechanics
+// [+] Implement score mechanics
 // [+] Add main menu
-// [-] Add sound effects and music
+// [+] Add sound effects and music
 // [+] Implement custom level creator
 // [+] Implement custom level saving, making own files
 // [-] Implement achievements
@@ -73,9 +73,9 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
         _T("Mahex&Huso"),                                           // Title Text
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,   // Non-resizable window
         252,                                                        // Center the window assuming
-        120,                                                        // screen size is 1200x720
-        WINDOW_WIDTH+16,                                            // Window width
-        WINDOW_HEIGHT+39,                                           // and height considering border and ribbon
+        120,                                                        // screen size is 1920x1080
+        WINDOW_WIDTH+16,                                            // Window width(1200)
+        WINDOW_HEIGHT+39,                                           // and height(720) considering border and ribbon
         HWND_DESKTOP,                                               // The window is a child-window to desktop
         NULL,                                                       // No menu
         hThisInstance,                                              // Program Instance handler
@@ -89,8 +89,11 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
     DWORD previousTime = GetTickCount();
     DWORD currentTime;
     DWORD deltaTime;
+    int fpsCount = 0;
 
     while(true) {
+        fpsCount = (fpsCount + 1) % 200;
+
         if(PeekMessage(&messages, NULL, 0, 0, PM_REMOVE)) {
             if(messages.message == WM_QUIT) {
                 break;
@@ -103,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
         deltaTime = currentTime - previousTime;
 
         if(deltaTime >= 1000 / FPS_MAX) {
-            game.Update();
+            game.Update(fpsCount);
             game.Render();
 
             previousTime = currentTime;
@@ -117,6 +120,10 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
 
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch(message) {
+        case MM_MCINOTIFY:
+            MessageBox(hwnd, std::to_wstring(wParam).c_str(), L"wParam", MB_OK);
+            MessageBox(hwnd, std::to_wstring(lParam).c_str(), L"lParam", MB_OK);
+            break;
         case WM_DESTROY:
             PostQuitMessage(0);
             break;

@@ -1,5 +1,7 @@
 #include "headers/SoundManager.hpp"
 
+SoundManager::SoundManager(HWND hwnd) { m_hwnd = hwnd; }
+
 SoundManager::~SoundManager() {
     StopBackgroundMusic();
 
@@ -40,26 +42,11 @@ void SoundManager::PlayCustomSound(const std::string& sound) {
 }
 
 void SoundManager::PlayBackgroundMusic() {
-    CleanupFinishedThreads();
-
-    auto now = std::chrono::system_clock::now();
-    auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    std::stringstream aliasStream;
-    aliasStream << "bgm_" << timestamp;
-    std::string alias = aliasStream.str();
-
-    std::wstring wAlias;
-    wAlias.assign(alias.begin(), alias.end());
-
-    m_threadBackgroundMusic.alias = alias;
-    m_threadBackgroundMusic.thread = std::thread(&SoundManager::PlaySoundFileLooped, this, "background", wAlias);
+    PlaySound(m_sounds["background"].c_str(), NULL, SND_LOOP | SND_ASYNC);
 }
 
 void SoundManager::StopBackgroundMusic() {
-    CleanupFinishedThreads();
-
-    StopSound(m_threadBackgroundMusic.alias);
-    if(m_threadBackgroundMusic.thread.joinable()) m_threadBackgroundMusic.thread.join();
+    PlaySound(NULL, NULL, 0);
 }
 
 bool SoundManager::IsSoundPlaying(const std::string &alias) {
@@ -79,6 +66,8 @@ bool SoundManager::IsSoundPlaying(const std::string &alias) {
         wAlias.assign(m_threadGameOver.alias.begin(), m_threadGameOver.alias.end());
         statusCmd = L"status " + wAlias + L" mode";
     }
+
+    if(statusCmd == L"") return false;
 
     mciSendString(statusCmd.c_str(), status, 256, NULL);
     return std::wstring(status) == L"playing";
@@ -102,15 +91,22 @@ void SoundManager::PlaySoundFile(const std::string &sound, const std::wstring &a
     mciSendString(openCommand.c_str(), NULL, 0, NULL);
 
     std::wstring playCommand = L"play " + alias;
-    mciSendString(playCommand.c_str(), NULL, 0, NULL);
+    mciSendString(playCommand.c_str(), NULL, 0, m_hwnd);
 }
 
 void SoundManager::PlaySoundFileLooped(const std::string &sound, const std::wstring &alias) {
     std::wstring openCommand = L"open \"" + m_sounds[sound] + L"\" type waveaudio alias " + alias;
-    mciSendString(openCommand.c_str(), NULL, 0, NULL);
+    MCIERROR openError = mciSendString(openCommand.c_str(), NULL, 0, NULL);
+    if(openError != 0) {
+        MessageBox(m_hwnd, L"Could not open background music file!", L"Error", MB_OK);
+        return;
+    }
 
     std::wstring playCommand = L"play " + alias + L" repeat";
-    mciSendString(playCommand.c_str(), NULL, 0, NULL);
+    MCIERROR playError = mciSendString(playCommand.c_str(), NULL, 0, m_hwnd);
+    if(playError != 0) {
+        MessageBox(m_hwnd, L"Could not play background music file!", L"Error", MB_OK);
+    }
 }
 
 void SoundManager::CleanupFinishedThreads() {

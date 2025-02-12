@@ -490,18 +490,14 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                 }
                 m_grid[x][y].m_id = m_currentID;
                 m_grid[x][y].m_orientation = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation;
-                if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_orientation == Orientation::HORIZONTAL) {
-                    if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX == m_grid[x][y].m_posX) {
-                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
-                    } else {
-                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
-                    }
+                if(m_grid[x][y].m_posX == m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX) {
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_startPos = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posY;
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = m_grid[x][y].m_posY;
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_movement = Orientation::VERTICAL;
                 } else {
-                    if(m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX == m_grid[x][y].m_posX) {
-                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = y;
-                    } else {
-                        m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = x;
-                    }
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_startPos = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX;
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = m_grid[x][y].m_posX;
+                    m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_movement = Orientation::HORIZONTAL;
                 }
                 break;
         }
