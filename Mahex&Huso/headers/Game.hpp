@@ -93,7 +93,7 @@ class Game {
 		bool m_animationInProgressGameOver = false;
 
 		bool musicEnabled, soundEffectsEnabled;
-		bool customLevelPlaying = false;
+		bool customLevelPlaying = false, levelInProgress = false;
 		std::string customLevelPath;
 
 		Label m_label;
@@ -133,9 +133,9 @@ class Game {
 		void RenderLevelEditor();
 		void RenderOptions();
 		void RenderInGame();
-		void RenderPause();
-		void RenderGameWin();
-		void RenderGameOver();
+		void RenderPause(const HDC&);
+		void RenderGameWin(const HDC&);
+		void RenderGameOver(const HDC&);
 		void RenderTiles(const HDC&, const HDC&);
 
 		void CheckPressureBlocks();
@@ -155,10 +155,4 @@ class Game {
 		void SaveSettings();
 
 		void UpdateWindowSize(bool isEditor);
-
-		//bool LoadCustomFont();
-		//void CleanupFont();
-
-		bool ToggleFullScreen();
-		bool ToggleFullScreen(bool);
 };

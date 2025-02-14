@@ -120,10 +120,6 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
 
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch(message) {
-        case MM_MCINOTIFY:
-            MessageBox(hwnd, std::to_wstring(wParam).c_str(), L"wParam", MB_OK);
-            MessageBox(hwnd, std::to_wstring(lParam).c_str(), L"lParam", MB_OK);
-            break;
         case WM_DESTROY:
             PostQuitMessage(0);
             break;

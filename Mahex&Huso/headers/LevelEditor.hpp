@@ -38,6 +38,8 @@ class LevelEditor {
     std::vector<std::vector<Tile>> m_grid;
     TileType m_selectedTile;
     Orientation m_selectedOrientation;
+    bool m_blockPlaced = false;
+    bool m_platesNotAligned = false;
 
     POINT m_mahexStart, m_husoStart;
     POINT m_mahexEnd, m_husoEnd;
@@ -53,7 +55,6 @@ class LevelEditor {
     int m_pressurePlateStartX, m_pressurePlateStartY;
     int m_currentID;
 
-    void CheckBitmaps();
     void ConstructButtons();
     void CheckHoverStatus(const POINT&);
     void RenderButtons(const HDC&);

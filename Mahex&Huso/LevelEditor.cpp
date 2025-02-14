@@ -454,6 +454,7 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                     }
                 }
                 m_grid[x][y].m_id = m_currentID;
+                m_blockPlaced = true;
                 break;
             case TileType::KEYDOWN_PLATE:
                 for(int i = 0; i < m_grid.size(); ++i) {
@@ -465,6 +466,7 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                 }
                 m_grid[x][y].m_orientation = m_selectedOrientation;
                 m_grid[x][y].m_id = m_currentID;
+                m_blockPlaced = true;
                 break;
             case TileType::PRESSURE_PLATE_START:
                 for(int i = 0; i < m_grid.size(); ++i) {
@@ -478,6 +480,7 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                 m_grid[x][y].m_id = m_currentID;
                 m_pressurePlateStartX = x;
                 m_pressurePlateStartY = y;
+                m_blockPlaced = true;
                 break;
 
             case TileType::PRESSURE_PLATE_END:
@@ -494,11 +497,14 @@ void LevelEditor::SetTile(int x, int y, TileType tileType) {
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_startPos = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posY;
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = m_grid[x][y].m_posY;
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_movement = Orientation::VERTICAL;
-                } else {
+                } else if(m_grid[x][y].m_posY == m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posY) {
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_startPos = m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_posX;
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_endPos = m_grid[x][y].m_posX;
                     m_grid[m_pressurePlateStartX][m_pressurePlateStartY].m_movement = Orientation::HORIZONTAL;
+                } else {
+                    m_platesNotAligned = true;
                 }
+                m_blockPlaced = true;
                 break;
         }
 
@@ -792,20 +798,31 @@ void LevelEditor::CheckInput() {
         if(!m_spacePressed) {
             m_spacePressed = true;
             if(m_selectedTile == TileType::KEYDOWN_BLOCK) {
+                if(!m_blockPlaced) return;
                 m_selectedTile = TileType::KEYDOWN_PLATE;
                 m_mechanicalTileInProgress = true;
+                m_blockPlaced = false;
             } else if(m_selectedTile == TileType::KEYDOWN_PLATE) {
+                if(!m_blockPlaced) return;
                 m_selectedTile = TileType::KEYDOWN_BLOCK;
                 m_mechanicalTileInProgress = false;
+                m_blockPlaced = false;
                 ++m_currentID;
             } else if(m_selectedTile == TileType::PRESSURE_BLOCK) {
+                if(!m_blockPlaced) return;
                 m_selectedTile = TileType::PRESSURE_PLATE_START;
                 m_mechanicalTileInProgress = true;
+                m_blockPlaced = false;
             } else if(m_selectedTile == TileType::PRESSURE_PLATE_START) {
+                if(!m_blockPlaced) return;
                 m_selectedTile = TileType::PRESSURE_PLATE_END;
+                m_blockPlaced = false;
             } else if(m_selectedTile == TileType::PRESSURE_PLATE_END) {
+                if(!m_blockPlaced) return;
                 m_selectedTile = TileType::PRESSURE_BLOCK;
                 m_mechanicalTileInProgress = false;
+                m_blockPlaced = false;
+                if(m_platesNotAligned) RemoveNonFinishedMechanicalTile();
                 ++m_currentID;
             }
         }

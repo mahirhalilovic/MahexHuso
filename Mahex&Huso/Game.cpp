@@ -290,7 +290,7 @@ void Game::UpdatePlayer(Player &player) {
                 player.m_velY = 0;
                 player.m_grounded = true;
             } else if(player.m_velY < 0 && currentRect.top >= tileCheck.bottom) {
-                if(tile.m_type == TileType::PRESSURE_PLATE_START || tile.m_type == TileType::KEYDOWN_PLATE) {
+                if((tile.m_type == TileType::PRESSURE_PLATE_START || tile.m_type == TileType::KEYDOWN_PLATE) && tile.m_orientation == Orientation::HORIZONTAL) {
                     newPosY = tileCheck.bottom - 16;
                 } else {
                     newPosY = tileCheck.bottom;
@@ -411,17 +411,14 @@ void Game::Render() {
 
         case GameState::PAUSE:
             RenderInGame();
-            RenderPause();
             break;
 
         case GameState::GAME_WIN:
             RenderInGame();
-            RenderGameWin();
             break;
 
         case GameState::GAME_OVER:
             RenderInGame();
-            RenderGameOver();
             break;
     }
 }
@@ -627,6 +624,10 @@ void Game::RenderInGame() {
     SelectObject(hdcMem, Huso.m_bitmap);
     BitBlt(hdcBuffer, Huso.m_posX, Huso.m_posY, PLAYER_WIDTH, PLAYER_HEIGHT, hdcMem, Huso.m_spriteCounter * PLAYER_WIDTH, (int) Huso.m_direction * PLAYER_HEIGHT, SRCAND);
 
+    if(m_state == GameState::PAUSE) RenderPause(hdcBuffer);
+    else if(m_state == GameState::GAME_WIN) RenderGameWin(hdcBuffer);
+    else if(m_state == GameState::GAME_OVER) RenderGameOver(hdcBuffer);
+
     BitBlt(hdc, 0, 0, clientRect.right, clientRect.bottom, hdcBuffer, 0, 0, SRCCOPY);
 
     DeleteObject(brush);
@@ -639,8 +640,7 @@ void Game::RenderInGame() {
     ReleaseDC(m_hwnd, hdc);
 }
 
-void Game::RenderPause() {
-    HDC hdc = GetDC(m_hwnd);
+void Game::RenderPause(const HDC &hdc) {
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
 
@@ -683,12 +683,9 @@ void Game::RenderPause() {
     DeleteObject(backgroundBrush);
     SelectObject(hdc, oldPen);
     DeleteObject(pen);
-
-    ReleaseDC(m_hwnd, hdc);
 }
 
-void Game::RenderGameWin() {
-    HDC hdc = GetDC(m_hwnd);
+void Game::RenderGameWin(const HDC &hdc) {
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
 
@@ -741,12 +738,9 @@ void Game::RenderGameWin() {
     DeleteObject(backgroundBrush);
     SelectObject(hdc, oldPen);
     DeleteObject(pen);
-
-    ReleaseDC(m_hwnd, hdc);
 }
 
-void Game::RenderGameOver() {
-    HDC hdc = GetDC(m_hwnd);
+void Game::RenderGameOver(const HDC &hdc) {
     RECT clientRect;
     GetClientRect(m_hwnd, &clientRect);
 
@@ -788,8 +782,6 @@ void Game::RenderGameOver() {
     DeleteObject(backgroundBrush);
     SelectObject(hdc, oldPen);
     DeleteObject(pen);
-
-    ReleaseDC(m_hwnd, hdc);
 }
 
 void Game::RenderTiles(const HDC &hdc, const HDC &hdcBuffer) {
@@ -1064,6 +1056,7 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 customLevelPlaying = true;
+                m_soundManager.PlayBackgroundMusic();
             } else if(buttonCustomLevelsEdit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::LEVEL_EDITOR;
                 m_levelEditor = LevelEditor(m_hwnd);
@@ -1079,8 +1072,10 @@ void Game::ProcessMouseClick(POINT mousePos) {
 
                 if(musicEnabled) {
                     buttonOptionsMusic.SetText(L"MUSIC: ON");
+                    m_soundManager.PlayBackgroundMusic();
                 } else {
                     buttonOptionsMusic.SetText(L"MUSIC: OFF");
+                    m_soundManager.StopBackgroundMusic();
                 }
             } else if(buttonOptionsSoundEffects.IsMouseOver(mousePos.x, mousePos.y)) {
                 soundEffectsEnabled = !soundEffectsEnabled;
@@ -1091,7 +1086,15 @@ void Game::ProcessMouseClick(POINT mousePos) {
                     buttonOptionsSoundEffects.SetText(L"SOUND EFFECTS: OFF");
                 }
             } else if(buttonBack.IsMouseOver(mousePos.x, mousePos.y)) {
-                m_state = GameState::MAIN_MENU;
+                if(levelInProgress) {
+                    levelInProgress = false;
+                    m_state = GameState::PAUSE;
+                    if(musicEnabled) {
+                        m_soundManager.PlayBackgroundMusic();
+                    }
+                } else {
+                    m_state = GameState::MAIN_MENU;
+                }
             }
             break;
 
@@ -1108,10 +1111,12 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 m_soundManager.StopBackgroundMusic();
                 if(musicEnabled) m_soundManager.PlayBackgroundMusic();
             } else if(buttonPauseMenuOptions.IsMouseOver(mousePos.x, mousePos.y)) {
+                levelInProgress = true;
                 m_state = GameState::OPTIONS;
             } else if(buttonPauseMenuQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
                 if(customLevelPlaying) customLevelPlaying = false;
+                m_soundManager.StopBackgroundMusic();
             }
             break;
 
@@ -1122,14 +1127,18 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
                 if(musicEnabled) m_soundManager.PlayBackgroundMusic();
+                m_animationInProgressGameWin = false;
             } else if(buttonGameWinRestart.IsMouseOver(mousePos.x, mousePos.y)) {
                 LoadLevel(m_currentLevel);
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
                 if(musicEnabled) m_soundManager.PlayBackgroundMusic();
+                m_animationInProgressGameWin = false;
             } else if(buttonGameWinQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
                 if(customLevelPlaying) customLevelPlaying = false;
+                m_soundManager.StopBackgroundMusic();
+                m_animationInProgressGameWin = false;
             }
             break;
 
@@ -1139,9 +1148,12 @@ void Game::ProcessMouseClick(POINT mousePos) {
                 m_state = GameState::IN_GAME;
                 m_soundManager.StopBackgroundMusic();
                 if(musicEnabled) m_soundManager.PlayBackgroundMusic();
+                m_animationInProgressGameOver = false;
             } else if(buttonGameOverQuit.IsMouseOver(mousePos.x, mousePos.y)) {
                 m_state = GameState::MAIN_MENU;
                 if(customLevelPlaying) customLevelPlaying = false;
+                m_soundManager.StopBackgroundMusic();
+                m_animationInProgressGameOver = false;
             }
             break;
     }

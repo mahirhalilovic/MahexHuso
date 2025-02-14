@@ -71,10 +71,10 @@
     <ClInclude Include="headers\LevelEditor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Label.hpp">
+    <ClInclude Include="headers\SoundManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\SoundManager.hpp">
+    <ClInclude Include="headers\Label.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
